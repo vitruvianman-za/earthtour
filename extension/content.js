@@ -48,9 +48,12 @@
     return true;
   }
 
-  // ---------- Earth: tour panel ----------
+  // ---------- Earth: tour layer ----------
+  // The background writes the live tour to storage as it streams in; this page
+  // listens for changes to it, so stops appear here as soon as they're written.
   let tourHost = null;
   let tour = null;
+  let myTabId = null;
 
   function closeTourUI() {
     if (tourHost) tourHost.remove();
@@ -58,36 +61,59 @@
     tour = null;
   }
 
-  async function showTour() {
-    if (!onEarth) return false;
-    const active = await send({ type: 'getTour' });
-    if (!active || !active.ok || !active.data) return false;
-
-    closeTourUI();
-    tourHost = document.createElement('earth-jump-tour');
+  function ensureTourUI() {
+    if (tour) return tour;
+    tourHost = document.createElement('earth-tour-layer');
     tourHost.style.cssText = 'all:initial;';
     const shadow = tourHost.attachShadow({ mode: 'closed' });
     (document.body || document.documentElement).appendChild(tourHost);
-
-    const { tour: data, index } = active.data;
-    tour = window.EarthJumpTour(shadow, {
-      tour: data,
-      index,
+    tour = window.EarthTourUI(shadow, {
       fly: earthFly,
       onIndex: (i) => send({ type: 'tourIndex', index: i }),
+      onRetry: () => send({ type: 'retryTour' }),
       onClose: () => {
         send({ type: 'endTour' });
         closeTourUI();
       }
     });
-    return true;
+    return tour;
+  }
+
+  function applyTour(active) {
+    if (!active || active.tabId !== myTabId) {
+      if (tour) closeTourUI();
+      return;
+    }
+    ensureTourUI().update(active);
+  }
+
+  async function initTour() {
+    const who = await send({ type: 'whoami' });
+    myTabId = who && who.ok ? who.data : null;
+    if (myTabId == null) return;
+    const got = await send({ type: 'getTour' });
+    if (got && got.ok && got.data) applyTour(got.data);
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local' || !changes.activeTour) return;
+      applyTour(changes.activeTour.newValue || null);
+    });
   }
 
   if (onEarth) {
     // Earth takes a few seconds to boot; wait for its app before flying anywhere.
-    const boot = () => setTimeout(showTour, 2500);
+    const boot = () => setTimeout(initTour, 2500);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
     else boot();
+
+    // Dragging or zooming the map moves the stop off-centre, so hide its marker.
+    const moved = (e) => {
+      if (!tour) return;
+      const path = e.composedPath();
+      if (path.includes(tourHost) || (paletteHost && path.includes(paletteHost))) return;
+      tour.mapMoved();
+    };
+    window.addEventListener('pointerdown', moved, true);
+    window.addEventListener('wheel', moved, { capture: true, passive: true });
   }
 
   // ---------- keyboard ----------
@@ -149,14 +175,6 @@
       } catch {
         sendResponse({ ok: false });
       }
-    }
-    if (msg.type === 'tourShow') {
-      if (!onEarth) {
-        sendResponse({ ok: false });
-        return;
-      }
-      sendResponse({ ok: true });
-      showTour();
     }
   });
 })();

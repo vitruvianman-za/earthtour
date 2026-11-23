@@ -1,115 +1,130 @@
-/* Earth Jump tour panel. Floats over Google Earth and flies stop to stop.
-   Exposes window.EarthJumpTour(mount, options). */
+/* Earth Tour: the tour layer that sits on Google Earth.
+   Two parts: an atlas-style annotation pinned to the stop on the map, and a
+   documentary band along the bottom with subtitles and a time-scale timeline.
+   Exposes window.EarthTourUI(mount, options). */
 (function () {
-  if (window.EarthJumpTour) return;
+  if (window.EarthTourUI) return;
 
-  // ---------- fonts: bundled Source Serif 4, loaded from bytes so page CSP can't block it ----------
+  // ---------- fonts: bundled, loaded from bytes so the page's CSP can't block them ----------
   let fontsPromise = null;
   function loadFonts() {
     if (fontsPromise) return fontsPromise;
     const faces = [
-      ['source-serif-4-latin-400-normal.woff2', '400', 'normal'],
-      ['source-serif-4-latin-400-italic.woff2', '400', 'italic'],
-      ['source-serif-4-latin-600-normal.woff2', '600', 'normal']
+      ['ET Sans', 'inter-latin-400-normal.woff2', '400'],
+      ['ET Sans', 'inter-latin-500-normal.woff2', '500'],
+      ['ET Sans', 'inter-latin-600-normal.woff2', '600'],
+      ['ET Mono', 'courier-prime-latin-400-normal.woff2', '400'],
+      ['ET Mono', 'courier-prime-latin-700-normal.woff2', '700']
     ];
     fontsPromise = Promise.all(
-      faces.map(async ([file, weight, style]) => {
+      faces.map(async ([family, file, weight]) => {
         const buf = await fetch(chrome.runtime.getURL('fonts/' + file)).then((r) => r.arrayBuffer());
-        const face = new FontFace('EJ Serif', buf, { weight, style });
+        const face = new FontFace(family, buf, { weight, style: 'normal' });
         await face.load();
         document.fonts.add(face);
       })
-    ).catch(() => {}); // fall back to Georgia
+    ).catch(() => {}); // fall back to system fonts
     return fontsPromise;
   }
 
   const CSS = `
-.et-root{all:initial;--ink:rgba(20,33,58,.94);--line:rgba(232,237,245,.12);--chart:#E8EDF5;--mist:#9AAAC4;--route:#8FD3E8;--ok:#7DCEA0;--warn:#E8C065;--bad:#EE8F86;--serif:"EJ Serif","Source Serif 4",Georgia,serif;
-  font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--chart);-webkit-font-smoothing:antialiased}
-.et-root *,.et-root *::before,.et-root *::after{box-sizing:border-box}
-.et-panel{position:fixed;left:16px;top:92px;z-index:2147483646;width:min(384px,calc(100vw - 32px));max-height:calc(100vh - 210px);display:flex;flex-direction:column;
-  background:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px rgba(4,10,24,.5),0 2px 8px rgba(4,10,24,.35);
-  -webkit-backdrop-filter:blur(18px) saturate(130%);backdrop-filter:blur(18px) saturate(130%);overflow:hidden;animation:et-in .22s ease-out}
-@keyframes et-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.et{all:initial;--hi:#FFC94A;--band:rgba(14,16,20,.82);--w2:rgba(255,255,255,.72);--w3:rgba(255,255,255,.36);
+  --sans:"ET Sans",Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"ET Mono","Courier Prime",ui-monospace,monospace;
+  font:14px/1.45 var(--sans);color:#fff;-webkit-font-smoothing:antialiased}
+.et *,.et *::before,.et *::after{box-sizing:border-box}
+:where(.et) :where(button){all:unset;cursor:pointer;box-sizing:border-box}
+.et button:focus-visible,.et .lnk:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
 
-.et-head{display:flex;align-items:center;gap:8px;padding:12px 10px 0 16px}
-.et-name{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--mist);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.et-icon{all:unset;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--mist);cursor:pointer}
-.et-icon:hover{background:rgba(232,237,245,.08);color:var(--chart)}
-.et-icon:focus-visible,.et-btn:focus-visible,.et-node:focus-visible,.et-src summary:focus-visible{outline:2px solid var(--route);outline-offset:2px}
-.et-icon svg{width:16px;height:16px}
+/* annotation pinned to the stop (Earth lands with the stop at the centre of the view) */
+.ann{position:fixed;left:50%;top:50%;z-index:2147483645;pointer-events:none;opacity:0;transition:opacity .4s}
+.ann.on{opacity:1}
+.pt{position:absolute;left:-7px;top:-7px;width:14px;height:14px;background:var(--hi);border:2px solid #111;box-shadow:0 0 0 2px #fff}
+.leader{position:absolute;left:0;top:-96px;width:120px;height:96px;overflow:visible}
+.lab{position:absolute;left:116px;top:-132px;width:max-content;max-width:min(300px,calc(50vw - 140px));padding:6px 10px 7px;
+  background:rgba(12,14,18,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.lab .k{display:block;font:700 12px/1.2 var(--mono);color:var(--hi)}
+.lab .t{display:block;margin-top:2px;font:600 19px/1.18 var(--sans);letter-spacing:-.01em}
+.lab .m{display:block;margin-top:3px;font:400 12.5px/1.3 var(--mono);color:var(--w2)}
 
-.et-track{display:flex;align-items:center;padding:12px 16px 6px;min-height:30px}
-.et-node{all:unset;flex:none;width:10px;height:10px;border-radius:50%;border:2px solid var(--mist);cursor:pointer;transition:transform .15s}
-.et-node:hover{transform:scale(1.25)}
-.et-node.done{background:var(--route);border-color:var(--route)}
-.et-node.cur{width:14px;height:14px;background:var(--route);border-color:var(--route);box-shadow:0 0 0 4px rgba(143,211,232,.22)}
-.et-leg{position:relative;flex:1;height:2px;margin:0 3px;overflow:hidden;opacity:.5;
-  background:repeating-linear-gradient(90deg,var(--mist) 0 4px,transparent 4px 8px)}
-.et-leg.done{background:var(--route);opacity:1}
-.et-leg.run{opacity:1}
-.et-leg.run::after{content:"";position:absolute;inset:0;background:var(--route);transform-origin:left;transform:scaleX(0);animation:et-run var(--dur) linear forwards}
-@keyframes et-run{to{transform:scaleX(1)}}
+/* documentary band */
+.band{position:fixed;z-index:2147483646;left:84px;right:236px;bottom:30px;max-width:760px;margin:0 auto;min-width:300px;
+  background:var(--band);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:2px solid var(--hi);
+  animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.x{position:absolute;right:6px;top:6px;width:28px;height:28px;display:grid;place-items:center;z-index:1}
+.x:hover,.ib:hover{background:rgba(255,255,255,.1)}
+.x svg{width:12px;height:12px}
+.sub{padding:12px 44px 10px 16px;max-height:min(34vh,13em);overflow:auto;font:400 14px/1.5 var(--sans);max-width:64ch}
+.sub .ttl{font-weight:600;font-size:15.5px}
+.sub .dim{color:var(--w2)}
+.sub .mono{font:400 12.5px/1.5 var(--mono);color:var(--w2)}
+.sub .err{color:#FFB4A8}
+.cursor{display:inline-block;width:7px;height:13px;margin-left:3px;background:var(--hi);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
 
-.et-body{flex:1;overflow:auto;padding:10px 16px 6px;transition:opacity .18s}
-.et-body.swap{opacity:0}
-.et-date{font:600 30px/1.1 var(--serif);letter-spacing:-.01em;font-variant-numeric:lining-nums}
-.et-title{margin:6px 0 2px;font:600 19px/1.25 var(--serif)}
-.et-h-intro{margin:2px 0 4px;font:600 25px/1.15 var(--serif);letter-spacing:-.01em}
-.et-place{font-size:12.5px;color:var(--mist)}
-.et-conf{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin:12px 0}
-.et-badge{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 7px;border-radius:999px;font-size:12px;font-weight:600}
-.et-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.et-badge.established{color:var(--ok);background:rgba(125,206,160,.12)}
-.et-badge.approximate{color:var(--warn);background:rgba(232,192,101,.12)}
-.et-badge.disputed{color:var(--bad);background:rgba(238,143,134,.12)}
-.et-conf-note{flex:1 1 180px;font-size:12px;color:var(--mist)}
-.et-narr{margin:0 0 12px;font:400 15.5px/1.62 var(--serif);color:rgba(232,237,245,.93)}
-.et-record{margin:4px 0 12px;padding:2px 0 2px 12px;border-left:2px solid var(--warn)}
-.et-record strong{display:block;font-size:12px;font-weight:600;color:var(--warn);margin-bottom:2px}
-.et-record p{margin:0;font-size:13px;line-height:1.5;color:rgba(232,237,245,.85)}
-.et-src{margin:0 0 10px}
-.et-src summary{list-style:none;cursor:pointer;font-size:12.5px;color:var(--mist);display:inline-flex;align-items:center;gap:6px;border-radius:4px}
-.et-src summary::-webkit-details-marker{display:none}
-.et-src summary::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
-.et-src[open] summary::before{transform:rotate(45deg)}
-.et-src summary:hover{color:var(--chart)}
-.et-src ul{margin:8px 0 0;padding:0 0 0 14px;font:italic 400 13.5px/1.5 var(--serif);color:rgba(232,237,245,.85)}
-.et-src li{margin:0 0 4px}
-.et-none{font-size:12.5px;color:var(--mist);margin:0 0 10px}
+.more{display:none;padding:2px 16px 12px;border-top:1px solid rgba(255,255,255,.12);font:400 12.5px/1.5 var(--sans);color:var(--w2)}
+.more.open{display:block}
+.more h3{all:unset;display:block;margin:10px 0 3px;font:700 11.5px var(--mono);color:#fff}
+.more ul{margin:0;padding:0;list-style:none;font:400 12.5px/1.55 var(--mono)}
+.more li{color:#fff}
+.more .legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font:400 11px var(--mono)}
+.more .legend svg{width:22px;height:6px;margin-right:6px;vertical-align:1px}
+.more .lnk{color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:400 12px var(--mono)}
 
-.et-foot{display:flex;align-items:center;gap:8px;padding:12px 16px 10px;border-top:1px solid var(--line)}
-.et-btn{all:unset;cursor:pointer;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--chart);background:rgba(232,237,245,.07)}
-.et-btn:hover{background:rgba(232,237,245,.12)}
-.et-btn[disabled]{opacity:.35;cursor:default;background:rgba(232,237,245,.07)}
-.et-play{min-width:44px;text-align:center}
-.et-btn.primary{background:var(--route);color:#0F1B30;font-weight:600}
-.et-btn.primary:hover{filter:brightness(1.07)}
-.et-count{margin-left:auto;font-size:12px;color:var(--mist);font-variant-numeric:tabular-nums}
-.et-disc{padding:0 16px 12px;font-size:11.5px;color:var(--mist);opacity:.85}
+.tl{display:flex;align-items:center;gap:10px;padding:0 10px 10px}
+.ctr{display:flex;gap:2px;flex:none}
+.ib{width:30px;height:30px;display:grid;place-items:center}
+.ib[disabled]{opacity:.3;cursor:default;background:none}
+.ib svg{width:12px;height:12px}
+.go{flex:none;padding:8px 12px;background:var(--hi);color:#111;font:600 12.5px/1 var(--sans);white-space:nowrap}
+.go[disabled]{opacity:.35;cursor:default}
+.meta{display:flex;gap:12px;flex:none;font:400 11.5px var(--mono);color:var(--w2);white-space:nowrap}
+.meta b{color:#fff;font-weight:700}
+.meta .lnk{color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
-@media (prefers-reduced-motion:reduce){
-  .et-panel{animation:none}.et-body{transition:none}.et-node{transition:none}
-  .et-leg.run::after{animation:none;transform:scaleX(1);opacity:.45}
-}`;
+/* time scale */
+.sc{position:relative;flex:1;min-width:120px;height:30px}
+.sc .base{position:absolute;left:0;right:0;top:9px;border-top:1px solid var(--w3)}
+.sc .leg{position:absolute;top:9px;height:0;border-top:2px solid var(--w3)}
+.sc .leg.approximate{border-top-style:dashed}
+.sc .leg.disputed{border-top-style:dotted;border-top-width:2.5px}
+.sc .leg.done{border-top-color:#fff}
+.sc .s{all:unset;position:absolute;top:5px;width:8px;height:8px;margin-left:-4px;border:1.5px solid var(--w2);transform:rotate(45deg);cursor:pointer;box-sizing:border-box}
+.sc .s.done{background:#fff;border-color:#fff}
+.sc .s.cur{top:3px;width:12px;height:12px;margin-left:-6px;background:var(--hi);border-color:#111;box-shadow:0 0 0 1.5px #fff}
+.sc .s.new{animation:pop .35s ease-out}
+.sc .s[disabled]{cursor:default}
+@keyframes pop{from{transform:rotate(45deg) scale(0)}to{transform:rotate(45deg) scale(1)}}
+.sc .y{position:absolute;top:18px;font:400 10.5px var(--mono);color:var(--w2);white-space:nowrap}
+.sc .y.cur{color:var(--hi);font-weight:700;transform:translateX(-50%)}
+.sc .y.r{right:0}
+
+@media (max-width:620px){.band{left:12px;right:12px}}
+@media (prefers-reduced-motion:reduce){.ann,.band,.sc .s.new,.cursor{transition:none;animation:none}}`;
+
+  const CERT = {
+    established: { label: 'Established', dash: '' },
+    approximate: { label: 'Approximate', dash: '7 5' },
+    disputed: { label: 'Disputed', dash: '0 6' }
+  };
 
   const ICON = {
-    kml: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
-    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    prev: '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.7"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg>',
+    next: '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>',
+    play: '<svg viewBox="0 0 12 12" fill="#fff"><path d="M3.5 2v8l6.5-4z"/></svg>',
+    pause: '<svg viewBox="0 0 12 12" fill="#fff"><path d="M3 2h2.2v8H3zM6.8 2H9v8H6.8z"/></svg>',
+    close: '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 2l8 8M10 2l-8 8"/></svg>'
   };
-  const CONF_LABEL = { established: 'Established', approximate: 'Approximate', disputed: 'Disputed' };
 
+  // ---------- helpers ----------
   function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
     if (text != null) n.textContent = text;
     return n;
   }
-
-  // ---------- cameras ----------
-  function earthCam(lat, lng, range, tilt, heading) {
-    return `https://earth.google.com/web/@${lat.toFixed(6)},${lng.toFixed(6)},0a,${Math.round(range)}d,35y,${Math.round(heading)}h,${tilt}t,0r`;
-  }
+  const pad2 = (n) => String(n).padStart(2, '0');
 
   function distanceM(a, b) {
     const R = 6371000, r = (x) => (x * Math.PI) / 180;
@@ -117,51 +132,66 @@
     return 2 * R * Math.asin(Math.sqrt(h));
   }
 
-  function overviewCam(stops) {
-    const c = {
-      lat: stops.reduce((s, p) => s + p.lat, 0) / stops.length,
-      lng: stops.reduce((s, p) => s + p.lng, 0) / stops.length
-    };
-    const spread = Math.max(...stops.map((p) => distanceM(c, p)));
-    const range = Math.min(9e6, Math.max(40000, spread * 2.8));
-    return earthCam(c.lat, c.lng, range, 0, 0);
+  function earthCam(lat, lng, range, tilt, heading) {
+    return `https://earth.google.com/web/@${lat.toFixed(6)},${lng.toFixed(6)},0a,${Math.round(range)}d,35y,${Math.round(heading)}h,${tilt}t,0r`;
   }
-
   function stopCam(s, i) {
     const range = Math.max(800, s.range_m || 8000);
-    const tilt = range < 60000 ? 55 : 25;
-    const heading = ((i * 47) % 50) - 25; // small swing between stops so each arrival feels different
-    return earthCam(s.lat, s.lng, range, tilt, heading);
+    return earthCam(s.lat, s.lng, range, range < 60000 ? 55 : 25, ((i * 47) % 50) - 25);
+  }
+  function overviewCam(stops) {
+    const c = { lat: stops.reduce((a, p) => a + p.lat, 0) / stops.length, lng: stops.reduce((a, p) => a + p.lng, 0) / stops.length };
+    const spread = Math.max(...stops.map((p) => distanceM(c, p)));
+    return earthCam(c.lat, c.lng, Math.min(9e6, Math.max(40000, spread * 2.8)), 0, 0);
   }
 
-  // ---------- KML export: lets people load the route line into an Earth project ----------
+  // "c. 1787" -> 1787, "334 BCE" -> -334, "June 1824" -> 1824; null if no year
+  function yearOf(date) {
+    const m = String(date || '').match(/(\d{1,4})\s*(BCE|BC)?/i);
+    if (!m) return null;
+    return m[2] ? -Number(m[1]) : Number(m[1]);
+  }
+  function yearLabel(y) {
+    return y < 0 ? `${-y} BCE` : String(y);
+  }
+
+  // Positions (0..100) on the time scale, with a minimum gap so close years stay clickable.
+  function positions(stops) {
+    const ys = stops.map((s) => yearOf(s.date));
+    for (let i = 0; i < ys.length; i++) {
+      if (ys[i] == null) ys[i] = i > 0 && ys[i - 1] != null ? ys[i - 1] : 0; // undated: sit with the previous stop
+    }
+    const lo = Math.min(...ys), hi = Math.max(...ys);
+    const span = hi - lo;
+    let pos = ys.map((y, i) => (span > 0 ? ((y - lo) / span) * 100 : stops.length > 1 ? (i / (stops.length - 1)) * 100 : 0));
+    const gap = Math.min(4, 100 / Math.max(1, stops.length));
+    for (let i = 1; i < pos.length; i++) pos[i] = Math.max(pos[i], pos[i - 1] + gap);
+    const last = pos[pos.length - 1];
+    if (last > 100) pos = pos.map((p) => (p / last) * 100);
+    return { pos, lo, hi };
+  }
+
+  // ---------- KML export ----------
   function xml(s) {
     return String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
   }
-
   function toKml(tour) {
     const line = tour.stops.map((s) => `${s.lng},${s.lat},0`).join(' ');
-    const marks = tour.stops
-      .map((s, i) => {
-        const desc = [
-          s.date,
-          s.narration,
-          `Confidence: ${CONF_LABEL[s.confidence] || s.confidence}${s.confidence_note ? ' (' + s.confidence_note + ')' : ''}`,
-          s.sources && s.sources.length ? 'Sources: ' + s.sources.join('; ') : ''
-        ].filter(Boolean).join('\n\n');
-        return `<Placemark><name>${xml(`${i + 1}. ${s.title}`)}</name><description>${xml(desc)}</description><Point><coordinates>${s.lng},${s.lat},0</coordinates></Point></Placemark>`;
-      })
-      .join('\n');
+    const marks = tour.stops.map((s, i) => {
+      const desc = [s.date, s.place, s.narration,
+        `Confidence: ${(CERT[s.confidence] || CERT.approximate).label}${s.confidence_note ? ' (' + s.confidence_note + ')' : ''}`,
+        s.sources && s.sources.length ? 'Sources: ' + s.sources.join('; ') : ''].filter(Boolean).join('\n\n');
+      return `<Placemark><name>${xml(`${i + 1}. ${s.title}`)}</name><description>${xml(desc)}</description><Point><coordinates>${s.lng},${s.lat},0</coordinates></Point></Placemark>`;
+    }).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
-<name>${xml(tour.title)}</name>
+<name>${xml(tour.title || 'Tour')}</name>
 <description>${xml(`${tour.span || ''}\n\n${tour.summary || ''}\n\n${tour.caveat || ''}\n\nAI-generated tour. Check the sources before relying on it.`)}</description>
-<Style id="route"><LineStyle><color>ffe8d38f</color><width>4</width></LineStyle></Style>
+<Style id="route"><LineStyle><color>ff4ac9ff</color><width>4</width></LineStyle></Style>
 <Placemark><name>Route</name><styleUrl>#route</styleUrl><LineString><tessellate>1</tessellate><coordinates>${line}</coordinates></LineString></Placemark>
 ${marks}
 </Document></kml>`;
   }
-
   function download(name, text) {
     const url = URL.createObjectURL(new Blob([text], { type: 'application/vnd.google-earth.kml+xml' }));
     const a = document.createElement('a');
@@ -171,206 +201,404 @@ ${marks}
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 
-  // ---------- the panel ----------
-  window.EarthJumpTour = function (mount, opts) {
-    const tour = opts.tour;
-    const stops = tour.stops;
-    const N = stops.length;
+  // ---------- the layer ----------
+  window.EarthTourUI = function (mount, opts) {
     const fly = opts.fly || (() => {});
     const onIndex = opts.onIndex || (() => {});
     const onClose = opts.onClose || (() => {});
-
+    const onRetry = opts.onRetry || (() => {});
     loadFonts();
 
     const style = el('style');
     style.textContent = CSS;
     mount.appendChild(style);
+    const root = el('div', 'et');
 
-    const root = el('div', 'et-root');
-    const panel = el('section', 'et-panel');
-    panel.setAttribute('aria-label', `Tour: ${tour.title}`);
+    // annotation
+    const ann = el('div', 'ann');
+    ann.setAttribute('aria-hidden', 'true');
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'leader');
+    svg.setAttribute('viewBox', '0 0 120 96');
+    const halo = document.createElementNS(NS, 'path');
+    const line = document.createElementNS(NS, 'path');
+    for (const [p, stroke, w, op] of [[halo, '#000', '4', '.55'], [line, '#fff', '2.2', '1']]) {
+      p.setAttribute('d', 'M0 96 L46 34 L116 34');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', stroke);
+      p.setAttribute('stroke-width', w);
+      p.setAttribute('stroke-linecap', 'round');
+      p.setAttribute('opacity', op);
+      svg.appendChild(p);
+    }
+    const pt = el('div', 'pt');
+    const lab = el('div', 'lab');
+    const labK = el('span', 'k'), labT = el('span', 't'), labM = el('span', 'm');
+    lab.append(labK, labT, labM);
+    ann.append(svg, pt, lab);
 
-    // header
-    const head = el('div', 'et-head');
-    const name = el('div', 'et-name', tour.title);
-    const kmlBtn = el('button', 'et-icon');
-    kmlBtn.type = 'button';
-    kmlBtn.innerHTML = ICON.kml;
-    kmlBtn.title = 'Download as KML. Import it into an Earth project to see the route line.';
-    kmlBtn.setAttribute('aria-label', 'Download tour as KML');
-    const closeBtn = el('button', 'et-icon');
-    closeBtn.type = 'button';
-    closeBtn.innerHTML = ICON.close;
-    closeBtn.title = 'End tour';
-    closeBtn.setAttribute('aria-label', 'End tour');
-    head.append(name, kmlBtn, closeBtn);
+    // band
+    const band = el('section', 'band');
+    band.setAttribute('aria-label', 'Tour');
+    const xBtn = el('button', 'x');
+    xBtn.innerHTML = ICON.close;
+    xBtn.setAttribute('aria-label', 'End tour');
+    xBtn.title = 'End tour';
+    const sub = el('div', 'sub');
+    sub.setAttribute('aria-live', 'polite');
+    const more = el('div', 'more');
+    const tl = el('div', 'tl');
+    band.append(xBtn, sub, more, tl);
 
-    const track = el('div', 'et-track');
-    track.setAttribute('role', 'group');
-    track.setAttribute('aria-label', 'Stops');
-    const body = el('div', 'et-body');
-    body.setAttribute('aria-live', 'polite');
-
-    const foot = el('div', 'et-foot');
-    const prevBtn = el('button', 'et-btn', 'Previous');
-    const playBtn = el('button', 'et-btn et-play', 'Play');
-    const nextBtn = el('button', 'et-btn primary', 'Next');
-    [prevBtn, playBtn, nextBtn].forEach((b) => (b.type = 'button'));
-    const count = el('div', 'et-count');
-    foot.append(prevBtn, playBtn, nextBtn, count);
-
-    const disc = el('div', 'et-disc', 'AI-generated tour. Check the sources before relying on it.');
-
-    panel.append(head, track, body, foot, disc);
-    root.append(panel);
+    root.append(ann, band);
     mount.appendChild(root);
 
     // ---------- state ----------
-    let i = Number.isInteger(opts.index) ? Math.max(-1, Math.min(N - 1, opts.index)) : -1;
+    let A = null;          // the active tour from storage
+    let i = -1;            // current stop; -1 = not started
+    let started = false;
     let playing = false;
     let timer = null;
+    let annTimer = null;
+    let flownOverview = false;
+    let lastCam = null;    // {lat,lng} of the last place we flew to
+    let seen = 0;          // stops already drawn, to animate new ones
+    let moreOpen = false;
+    let tick = null;
 
-    function words(s) {
-      return (s || '').trim().split(/\s+/).length;
+    const stops = () => (A && A.tour && A.tour.stops) || [];
+    const planning = () => A && A.status === 'planning';
+
+    // ---------- camera ----------
+    function flyTo(url, target) {
+      hideAnn();
+      fly(url);
+      if (!target) return;
+      // Show the annotation once Earth has roughly arrived: longer hops take longer.
+      const km = lastCam ? distanceM(lastCam, target) / 1000 : 2000;
+      lastCam = target;
+      const ms = 1500 + 1300 * Math.log10(1 + km);
+      clearTimeout(annTimer);
+      annTimer = setTimeout(showAnn, ms);
     }
-    function dwell(n) {
-      if (n < 0) return 6000;
-      return Math.min(26000, Math.max(11000, 7000 + words(stops[n].narration) * 230));
+    function hideAnn() {
+      clearTimeout(annTimer);
+      ann.classList.remove('on');
+    }
+    function showAnn() {
+      if (started && i >= 0) ann.classList.add('on');
     }
 
-    // ---------- render ----------
-    function renderTrack(runMs) {
-      track.textContent = '';
-      stops.forEach((s, k) => {
-        if (k > 0) {
-          const leg = el('div', 'et-leg');
-          if (k <= i) leg.classList.add('done');
-          else if (runMs && k === i + 1) {
-            leg.classList.add('run');
-            leg.style.setProperty('--dur', runMs + 'ms');
-          }
-          track.append(leg);
+    function renderAnn() {
+      const s = stops()[i];
+      if (!s) return;
+      const c = CERT[s.confidence] || CERT.approximate;
+      labK.textContent = planning() ? pad2(i + 1) : `${pad2(i + 1)} / ${pad2(stops().length)}`;
+      labT.textContent = s.title;
+      labM.textContent = `${s.date}${s.date ? ', ' : ''}${c.label.toLowerCase()}`;
+      for (const p of [halo, line]) {
+        if (c.dash) p.setAttribute('stroke-dasharray', c.dash);
+        else p.removeAttribute('stroke-dasharray');
+      }
+    }
+
+    // ---------- time scale ----------
+    function renderScale(cur) {
+      const sc = el('div', 'sc');
+      const list = stops();
+      sc.append(el('div', 'base'));
+      if (!list.length) {
+        tl.append(sc);
+        return;
+      }
+      const { pos, lo, hi } = positions(list);
+      for (let k = 1; k < list.length; k++) {
+        const leg = el('div', `leg ${list[k].confidence}${cur != null && k <= cur ? ' done' : ''}`);
+        leg.style.left = pos[k - 1] + '%';
+        leg.style.width = Math.max(0, pos[k] - pos[k - 1]) + '%';
+        sc.append(leg);
+      }
+      list.forEach((s, k) => {
+        const b = el('button', 's');
+        if (cur != null && k < cur) b.classList.add('done');
+        if (k === cur) {
+          b.classList.add('cur');
+          b.setAttribute('aria-current', 'step');
         }
-        const node = el('button', 'et-node');
-        node.type = 'button';
-        node.title = `${s.date ? s.date + ', ' : ''}${s.title}`;
-        node.setAttribute('aria-label', `Stop ${k + 1}: ${s.title}`);
-        if (k < i) node.classList.add('done');
-        if (k === i) {
-          node.classList.add('cur');
-          node.setAttribute('aria-current', 'step');
-        }
-        node.addEventListener('click', () => goTo(k));
-        track.append(node);
+        if (k >= seen) b.classList.add('new');
+        b.style.left = pos[k] + '%';
+        b.title = `${s.date ? s.date + ': ' : ''}${s.title}`;
+        b.setAttribute('aria-label', `Stop ${k + 1}: ${s.title}`);
+        if (!started) b.disabled = true;
+        else b.addEventListener('click', () => goTo(k));
+        sc.append(b);
       });
+      seen = list.length;
+      const yl = el('span', 'y', yearLabel(lo));
+      yl.style.left = '0';
+      sc.append(yl);
+      if (cur != null && list[cur] && pos[cur] > 12 && pos[cur] < 88) {
+        const yc = el('span', 'y cur', list[cur].date);
+        yc.style.left = pos[cur] + '%';
+        sc.append(yc);
+      }
+      if (hi !== lo) sc.append(el('span', 'y r', yearLabel(hi)));
+      tl.append(sc);
+    }
+
+    // ---------- band contents ----------
+    function button(cls, html, label, onClick, disabled) {
+      const b = el('button', cls);
+      b.innerHTML = html;
+      b.setAttribute('aria-label', label);
+      b.title = label;
+      if (disabled) b.disabled = true;
+      else b.addEventListener('click', onClick);
+      return b;
+    }
+
+    function elapsed() {
+      const s = Math.max(0, Math.round((Date.now() - (A.started || Date.now())) / 1000));
+      return `${pad2(Math.floor(s / 60))}:${pad2(s % 60)}`;
+    }
+
+    function renderPlanning() {
+      const list = stops();
+      const t = A.tour || {};
+      sub.textContent = '';
+      const head = el('div');
+      head.append(el('span', 'dim', 'Planning a tour: '), el('span', 'ttl', t.title || `“${A.phrase}”`));
+      sub.append(head);
+      const last = list[list.length - 1];
+      const ln = el('div', 'mono');
+      ln.append(document.createTextNode(last ? `${last.date}   ${last.title}` : A.region ? `Flying to ${A.region.name}` : 'Reading the record'));
+      ln.append(el('span', 'cursor'));
+      sub.append(ln);
+
+      tl.textContent = '';
+      const meta = el('div', 'meta');
+      meta.append(el('b', null, `${list.length} ${list.length === 1 ? 'stop' : 'stops'}`), el('span', null, elapsed()));
+      tl.append(meta);
+      renderScale(null);
+      const go = el('button', 'go', 'Start tour');
+      if (!list.length) go.disabled = true;
+      else go.addEventListener('click', start);
+      tl.append(go);
     }
 
     function renderIntro() {
-      body.append(el('div', 'et-place', tour.span || ''));
-      body.append(el('h2', 'et-h-intro', tour.title));
-      if (tour.summary) body.append(el('p', 'et-narr', tour.summary));
-      if (tour.caveat) {
-        const rec = el('div', 'et-record');
-        rec.append(el('strong', null, 'About the record'), el('p', null, tour.caveat));
-        body.append(rec);
+      const t = A.tour;
+      sub.textContent = '';
+      const head = el('div');
+      head.append(el('span', 'ttl', t.title || 'Tour'));
+      sub.append(head);
+      if (t.span) sub.append(el('div', 'mono', t.span));
+      if (t.summary) sub.append(el('div', null, t.summary));
+      if (t.caveat) {
+        const c = el('div', 'dim');
+        c.style.marginTop = '6px';
+        c.textContent = t.caveat;
+        sub.append(c);
       }
+      tl.textContent = '';
+      const meta = el('div', 'meta');
+      meta.append(el('b', null, `${stops().length} stops`));
+      tl.append(meta);
+      renderScale(null);
+      const go = el('button', 'go', 'Start tour');
+      go.addEventListener('click', start);
+      tl.append(go);
     }
 
-    function renderStop(s) {
-      body.append(el('div', 'et-date', s.date || ''));
-      body.append(el('h2', 'et-title', s.title));
-      body.append(el('div', 'et-place', s.place || ''));
+    function renderStop() {
+      const list = stops();
+      const s = list[i];
+      sub.textContent = s.narration || '';
+      renderMore();
 
-      const conf = el('div', 'et-conf');
-      conf.append(el('span', `et-badge ${s.confidence}`, CONF_LABEL[s.confidence] || s.confidence));
-      if (s.confidence_note) conf.append(el('span', 'et-conf-note', s.confidence_note));
-      body.append(conf);
+      tl.textContent = '';
+      const ctr = el('div', 'ctr');
+      const nextReady = i < list.length - 1;
+      ctr.append(
+        button('ib', ICON.prev, 'Previous stop', prev, i <= 0),
+        button('ib', playing ? ICON.pause : ICON.play, playing ? 'Pause' : 'Play', togglePlay),
+        button('ib', ICON.next, nextReady ? 'Next stop' : planning() ? 'Next stop is still arriving' : 'End of tour', next, !nextReady)
+      );
+      tl.append(ctr);
+      renderScale(i);
+      const meta = el('div', 'meta');
+      const n = s.sources ? s.sources.length : 0;
+      const lnk = el('button', 'lnk', moreOpen ? 'Hide notes' : n ? `${n} ${n === 1 ? 'source' : 'sources'}` : 'Notes');
+      lnk.setAttribute('aria-expanded', String(moreOpen));
+      lnk.addEventListener('click', () => {
+        moreOpen = !moreOpen;
+        render();
+      });
+      meta.append(lnk, el('span', null, `${i + 1}/${list.length}${planning() ? '+' : ''}`));
+      tl.append(meta);
+    }
 
-      body.append(el('p', 'et-narr', s.narration || ''));
+    function legendItem(dash, label) {
+      const span = el('span');
+      span.innerHTML = `<svg viewBox="0 0 22 6"><path d="M1 3H21" stroke="#fff" stroke-width="2" stroke-linecap="round" ${dash ? `stroke-dasharray="${dash}"` : ''}/></svg>`;
+      span.append(document.createTextNode(label));
+      return span;
+    }
 
+    function renderMore() {
+      more.classList.toggle('open', moreOpen);
+      if (!moreOpen) return;
+      const s = stops()[i];
+      const t = A.tour;
+      more.textContent = '';
+      if (s.confidence_note) {
+        more.append(el('h3', null, `What's uncertain`), el('div', null, s.confidence_note));
+      }
+      more.append(el('h3', null, 'Sources'));
       if (s.sources && s.sources.length) {
-        const d = el('details', 'et-src');
-        d.append(el('summary', null, s.sources.length === 1 ? '1 source' : `${s.sources.length} sources`));
         const ul = el('ul');
         s.sources.forEach((x) => ul.append(el('li', null, x)));
-        d.append(ul);
-        body.append(d);
-      } else {
-        body.append(el('p', 'et-none', 'No sources cited for this stop.'));
+        more.append(ul);
+      } else more.append(el('div', null, 'No sources cited for this stop.'));
+      if (t.caveat) more.append(el('h3', null, 'About the record'), el('div', null, t.caveat));
+      const lg = el('div', 'legend');
+      lg.append(legendItem('', 'Established'), legendItem('7 5', 'Approximate'), legendItem('0 6', 'Disputed'));
+      more.append(lg);
+      const foot = el('div');
+      foot.style.marginTop = '10px';
+      foot.append(el('span', null, 'AI-generated tour. Check the sources before relying on it. '));
+      if (!planning()) {
+        const k = el('button', 'lnk', 'Download KML');
+        k.title = 'Import into a Google Earth project to see the route as a line';
+        k.addEventListener('click', () => {
+          const slug = (t.title || 'tour').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'tour';
+          download(`${slug}.kml`, toKml(t));
+        });
+        foot.append(k);
       }
+      more.append(foot);
     }
 
-    function render(runMs) {
-      renderTrack(runMs);
+    function renderError() {
+      sub.textContent = '';
+      sub.append(el('div', 'err', A.error || 'Something went wrong planning that tour.'));
+      tl.textContent = '';
+      const go = el('button', 'go', 'Try again');
+      go.addEventListener('click', () => onRetry());
+      tl.append(go);
+    }
 
-      body.classList.add('swap');
-      requestAnimationFrame(() => {
-        body.textContent = '';
-        if (i < 0) renderIntro();
-        else renderStop(stops[i]);
-        body.scrollTop = 0;
-        body.classList.remove('swap');
-      });
-
-      prevBtn.disabled = i < 0;
-      nextBtn.textContent = i < 0 ? 'Start tour' : i >= N - 1 ? 'Finish' : 'Next';
-      playBtn.textContent = playing ? 'Pause' : 'Play';
-      playBtn.setAttribute('aria-pressed', String(playing));
-      count.textContent = i < 0 ? `${N} stops` : `${i + 1} of ${N}`;
+    function render() {
+      if (!A) return;
+      clearInterval(tick);
+      tick = null;
+      if (A.status === 'error' && !started) return renderError();
+      if (!started) {
+        if (planning()) {
+          renderPlanning();
+          tick = setInterval(() => {
+            const m = tl.querySelector('.meta span');
+            if (m) m.textContent = elapsed();
+          }, 1000);
+          return;
+        }
+        return renderIntro();
+      }
+      renderStop();
+      renderAnn();
     }
 
     // ---------- navigation ----------
-    function schedule() {
-      clearTimeout(timer);
-      if (!playing) return render();
-      if (i >= N - 1) {
-        playing = false;
-        return render();
-      }
-      const ms = dwell(i);
-      render(i >= 0 ? ms : 0);
-      timer = setTimeout(() => goTo(i + 1), ms);
+    function start() {
+      started = true;
+      goTo(0);
     }
-
     function goTo(n) {
-      i = Math.max(-1, Math.min(N - 1, n));
+      const list = stops();
+      if (!list.length) return;
+      i = Math.max(0, Math.min(list.length - 1, n));
       onIndex(i);
-      fly(i < 0 ? overviewCam(stops) : stopCam(stops[i], i));
+      const s = list[i];
+      renderAnn();
+      flyTo(stopCam(s, i), s);
       schedule();
     }
-
     function next() {
-      if (i >= N - 1) return close();
-      goTo(i + 1);
+      if (i < stops().length - 1) goTo(i + 1);
     }
     function prev() {
-      if (i > -1) goTo(i - 1);
+      if (i > 0) goTo(i - 1);
+    }
+    function dwell(s) {
+      const words = (s.narration || '').trim().split(/\s+/).length;
+      return Math.min(26000, Math.max(11000, 7000 + words * 230));
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (playing) {
+        if (i >= stops().length - 1 && !planning()) playing = false;
+        else {
+          timer = setTimeout(function step() {
+            if (i < stops().length - 1) goTo(i + 1);
+            else if (planning()) timer = setTimeout(step, 1000); // wait for the next stop to arrive
+            else {
+              playing = false;
+              render();
+            }
+          }, dwell(stops()[i]));
+        }
+      }
+      render();
     }
     function togglePlay() {
       playing = !playing;
-      if (playing && i >= N - 1) return goTo(0);
-      if (playing && i < 0) return goTo(0);
+      if (playing && i >= stops().length - 1 && !planning()) return goTo(0);
       schedule();
     }
 
     function close() {
       clearTimeout(timer);
+      clearTimeout(annTimer);
+      clearInterval(tick);
       root.remove();
       style.remove();
       onClose();
     }
+    xBtn.addEventListener('click', close);
 
-    prevBtn.addEventListener('click', prev);
-    nextBtn.addEventListener('click', next);
-    playBtn.addEventListener('click', togglePlay);
-    closeBtn.addEventListener('click', close);
-    kmlBtn.addEventListener('click', () => {
-      const slug = tour.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'tour';
-      download(`${slug}.kml`, toKml(tour));
-    });
+    // ---------- updates from storage ----------
+    function update(active) {
+      const firstTime = !A;
+      A = active;
+      if (firstTime && Number.isInteger(active.index) && active.index >= 0 && stops().length) {
+        // Earth reloaded mid-tour: carry on where we were.
+        started = true;
+        i = Math.min(active.index, stops().length - 1);
+        seen = stops().length;
+        renderAnn();
+        flyTo(stopCam(stops()[i], i), stops()[i]);
+        render();
+        return;
+      }
+      if (!started && !flownOverview) {
+        if (A.status === 'ready' && stops().length) {
+          flownOverview = true;
+          fly(overviewCam(stops()));
+        } else if (A.region) {
+          flownOverview = true;
+          fly(earthCam(A.region.lat, A.region.lng, A.region.range_m || 400000, 0, 0));
+        }
+      }
+      // A planning job that stopped reporting (e.g. the browser restarted mid-way).
+      if (planning() && Date.now() - (A.started || 0) > 4 * 60 * 1000) {
+        A = { ...A, status: 'error', error: 'Planning stopped before it finished. Try again.' };
+      }
+      render();
+    }
 
     function handleKey(e) {
-      if (e.type !== 'keydown' || e.altKey || e.ctrlKey || e.metaKey) return false;
+      if (e.type !== 'keydown' || e.altKey || e.ctrlKey || e.metaKey || !started) return false;
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         next();
@@ -384,13 +612,14 @@ ${marks}
       return false;
     }
 
-    // first frame: fly to where the tour left off
-    fly(i < 0 ? overviewCam(stops) : stopCam(stops[i], i));
-    render();
+    // The person dragged or zoomed the map: the stop is no longer at the centre.
+    function mapMoved() {
+      hideAnn();
+    }
 
-    return { handleKey, close, el: root };
+    return { update, handleKey, mapMoved, close };
   };
 
-  // exposed for tests
-  window.EarthJumpTour._toKml = toKml;
+  window.EarthTourUI._toKml = toKml;
+  window.EarthTourUI._positions = positions;
 })();

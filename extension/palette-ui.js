@@ -4,43 +4,43 @@
   if (window.EarthJumpPalette) return;
 
   const CSS = `
-.ej-root{all:initial;font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#E8EDF5;-webkit-font-smoothing:antialiased}
+.ej-root{all:initial;font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#E8EDF5;-webkit-font-smoothing:antialiased}
 .ej-root *,.ej-root *::before,.ej-root *::after{box-sizing:border-box}
 .ej-overlay{position:fixed;inset:0;z-index:2147483647;display:none}
 .ej-overlay.ej-open{display:block}
 .ej-popup{display:block}
 .ej-backdrop{position:absolute;inset:0;background:rgba(10,12,16,.28)}
-.ej-panel{background:rgba(20,33,58,.94);border:1px solid rgba(232,237,245,.08);border-radius:14px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+.ej-panel{background:rgba(14,16,20,.88);border:0;border-top:2px solid #FFC94A;border-radius:0;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
 .ej-overlay .ej-panel{position:absolute;left:50%;top:14vh;width:min(580px,calc(100vw - 32px));transform:translateX(-50%);animation:ej-in .16s ease-out}
 @keyframes ej-in{from{opacity:0;transform:translate(-50%,-6px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
-.ej-popup .ej-panel{width:400px;border:0;border-radius:0;box-shadow:none;background:#14213A}
+.ej-popup .ej-panel{width:400px;border:0;border-radius:0;box-shadow:none;background:#15171C}
 .ej-bar{display:flex;align-items:center;gap:10px;padding:14px 14px 14px 16px}
 .ej-icon{width:18px;height:18px;flex:none;color:#9AAAC4}
-.ej-input{all:unset;flex:1;min-width:0;font:inherit;font-size:16px;color:#E8EDF5;caret-color:#8FD3E8}
+.ej-input{all:unset;flex:1;min-width:0;font:inherit;font-size:16px;color:#E8EDF5;caret-color:#FFC94A}
 .ej-input::placeholder{color:#7F8EA8}
-.ej-target{all:unset;cursor:pointer;flex:none;font-size:12px;font-weight:600;letter-spacing:.02em;padding:4px 10px;border-radius:999px;background:rgba(232,237,245,.08);color:#C9D3E3;transition:background .15s,color .15s}
+.ej-target{all:unset;cursor:pointer;flex:none;font-size:12px;font-weight:600;letter-spacing:.02em;padding:4px 10px;border-radius:0;background:rgba(232,237,245,.08);color:#C9D3E3;transition:background .15s,color .15s}
 .ej-target[data-t=maps]{background:rgba(125,206,160,.14);color:#7DCEA0}
-.ej-target[data-t=earth]{background:rgba(143,211,232,.16);color:#8FD3E8}
+.ej-target[data-t=earth]{background:rgba(255,201,74,.16);color:#FFC94A}
 .ej-target:hover{filter:brightness(1.2)}
-.ej-mode{display:none;flex:none;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid rgba(143,211,232,.5);color:#8FD3E8}
+.ej-mode{display:none;flex:none;font-size:12px;font-weight:600;padding:3px 10px;border-radius:0;border:1px solid rgba(255,201,74,.6);color:#FFC94A}
 .ej-tour .ej-mode{display:inline-block}
 .ej-tour .ej-target{display:none}
 .ej-input:focus-visible,.ej-target:focus-visible,.ej-link:focus-visible{outline:none}
-.ej-target:focus-visible,.ej-link:focus-visible{box-shadow:0 0 0 2px #8FD3E8}
+.ej-target:focus-visible,.ej-link:focus-visible{box-shadow:0 0 0 2px #FFC94A}
 .ej-status{display:block;padding:0 16px 10px;font-size:12.5px;color:#9AAAC4}
 .ej-status:empty{display:none}
-.ej-status.ej-busy::before{content:"";display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#8FD3E8;vertical-align:1px;animation:ej-pulse 1s ease-in-out infinite}
+.ej-status.ej-busy::before{content:"";display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#FFC94A;vertical-align:1px;animation:ej-pulse 1s ease-in-out infinite}
 @keyframes ej-pulse{50%{opacity:.25}}
 .ej-status.ej-err{color:#EE8F86}
-.ej-link{all:unset;cursor:pointer;color:#8FD3E8;margin-left:6px;text-decoration:underline}
+.ej-link{all:unset;cursor:pointer;color:#FFC94A;margin-left:6px;text-decoration:underline}
 .ej-list{display:block;list-style:none;margin:0;padding:0 6px 6px;max-height:340px;overflow:auto;transition:opacity .15s}
 .ej-list:empty{display:none}
 .ej-list.ej-stale{opacity:.4}
-.ej-item{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:9px;cursor:pointer}
-.ej-item.ej-sel{background:rgba(143,211,232,.14)}
+.ej-item{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:0;cursor:pointer}
+.ej-item.ej-sel{background:rgba(255,201,74,.14)}
 .ej-name{font-weight:500;color:#E8EDF5}
 .ej-note{font-size:12.5px;color:#9AAAC4}
-.ej-skel{display:block;height:48px;margin:4px 0;border-radius:9px;background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 100%);background-size:200% 100%;animation:ej-shimmer 1.2s linear infinite}
+.ej-skel{display:block;height:48px;margin:4px 0;border-radius:0;background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 100%);background-size:200% 100%;animation:ej-shimmer 1.2s linear infinite}
 @keyframes ej-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
 .ej-hint{display:flex;flex-wrap:wrap;gap:14px;padding:9px 16px;border-top:1px solid rgba(255,255,255,.06);font-size:11.5px;color:#7F8EA8}
 .ej-hint kbd{font:inherit;font-size:11px;padding:1px 5px;margin-right:5px;border-radius:4px;background:rgba(232,237,245,.08);color:#C9D3E3}
@@ -212,17 +212,16 @@
       const id = ++reqId;
       candidates = [];
       resolvedFor = null;
-      setStatus('Planning the tour. This usually takes 20 to 40 seconds.', 'busy');
-      showSkeleton();
+      list.textContent = '';
+      setStatus('Opening the tour in Google Earth\u2026', 'busy');
 
       const res = await send({ type: 'startTour', phrase });
       if (id !== reqId) return;
       if (!res.ok) return showError(res);
 
-      list.textContent = '';
-      setStatus(`${res.data.title}: ${res.data.stops} stops. Opening in Earth\u2026`, 'busy');
+      // Planning carries on in Earth, where the stops appear as they're written.
       if (mode === 'popup') window.close();
-      else setTimeout(close, 500);
+      else setTimeout(close, 250);
     }
 
     // ---------- actions ----------

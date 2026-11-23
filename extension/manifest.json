@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Earth Tour",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Type a place or a historical journey and fly there in Google Earth or Google Maps. 'Follow Shaka's campaigns' becomes a stop-by-stop tour.",
   "action": {
     "default_popup": "popup.html",

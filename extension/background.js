@@ -1,4 +1,4 @@
-// Earth Jump service worker: resolves phrases, snaps coordinates, navigates tabs.
+// Earth Tour service worker: resolves phrases, snaps coordinates, navigates tabs.
 
 const MODEL = 'claude-haiku-5-5';
 
@@ -62,12 +62,13 @@ async function cacheSet(bucket, key, value) {
 // ---------- calling Claude ----------
 // Structured outputs: the request carries a JSON schema and the API constrains the reply
 // to it, so the JSON is always valid (a stray quote in a narration can't break it).
-async function callClaude({ model, system, schema, phrase, maxTokens }) {
+async function requestClaude({ model, system, schema, phrase, maxTokens, stream = false, signal }) {
   const { apiKey } = await chrome.storage.local.get('apiKey');
   if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
+    signal,
     headers: {
       'content-type': 'application/json',
       'x-api-key': apiKey,
@@ -78,6 +79,7 @@ async function callClaude({ model, system, schema, phrase, maxTokens }) {
       model,
       max_tokens: maxTokens,
       system,
+      stream,
       output_config: { format: { type: 'json_schema', schema } },
       messages: [{ role: 'user', content: phrase }]
     })
@@ -90,20 +92,112 @@ async function callClaude({ model, system, schema, phrase, maxTokens }) {
     const body = await res.text();
     throw new Error(`API ${res.status}: ${body.slice(0, 140)}`);
   }
+  return res;
+}
 
-  const data = await res.json();
-  if (data.stop_reason === 'max_tokens') {
-    throw new Error('The answer was cut off before it finished. Try a narrower request.');
-  }
-  if (data.stop_reason === 'refusal') {
-    throw new Error('Claude declined that request. Try phrasing it differently.');
-  }
-  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+function checkStop(reason) {
+  if (reason === 'max_tokens') throw new Error('The answer was cut off before it finished. Try a narrower request.');
+  if (reason === 'refusal') throw new Error('Claude declined that request. Try phrasing it differently.');
+}
+
+function parseJson(text) {
   try {
     return JSON.parse(text);
   } catch {
     throw new Error('Claude sent back something unexpected. Try again.');
   }
+}
+
+async function callClaude(opts) {
+  const res = await requestClaude(opts);
+  const data = await res.json();
+  checkStop(data.stop_reason);
+  return parseJson((data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
+}
+
+// Streams the reply and calls onText with everything received so far.
+async function streamClaude(opts, onText) {
+  const res = await requestClaude({ ...opts, stream: true });
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '';
+  let text = '';
+  let stop = null;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+    let cut;
+    while ((cut = buf.indexOf('\n\n')) >= 0) {
+      const event = buf.slice(0, cut);
+      buf = buf.slice(cut + 2);
+      const line = event.split('\n').find((l) => l.startsWith('data:'));
+      if (!line) continue;
+      let d;
+      try {
+        d = JSON.parse(line.slice(5));
+      } catch {
+        continue;
+      }
+      if (d.type === 'content_block_delta' && d.delta && d.delta.type === 'text_delta') {
+        text += d.delta.text;
+        onText(text);
+      } else if (d.type === 'message_delta' && d.delta && d.delta.stop_reason) {
+        stop = d.delta.stop_reason;
+      } else if (d.type === 'error') {
+        throw new Error((d.error && d.error.message) || 'The connection to Claude dropped. Try again.');
+      }
+    }
+  }
+  checkStop(stop);
+  return text;
+}
+
+// Pulls whatever is complete out of a partial tour JSON: the top-level text fields,
+// and each stop object once its closing brace has arrived.
+function partialTour(text) {
+  const out = { stops: [] };
+  for (const k of ['title', 'span', 'summary', 'caveat']) {
+    const m = text.match(new RegExp('"' + k + '"\\s*:\\s*("(?:[^"\\\\]|\\\\.)*")'));
+    if (m) {
+      try {
+        out[k] = JSON.parse(m[1]);
+      } catch {
+        // incomplete escape; try again on the next chunk
+      }
+    }
+  }
+  const si = text.indexOf('"stops"');
+  const ai = si < 0 ? -1 : text.indexOf('[', si);
+  if (ai < 0) return out;
+
+  let depth = 0, inStr = false, esc = false, start = -1;
+  for (let i = ai + 1; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === '{') {
+      if (depth === 0) start = i;
+      depth++;
+    } else if (c === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try {
+          out.stops.push(JSON.parse(text.slice(start, i + 1)));
+        } catch {
+          // shouldn't happen with constrained output
+        }
+        start = -1;
+      }
+    } else if (c === ']' && depth === 0) break;
+  }
+  return out;
 }
 
 const PLACES_SCHEMA = {
@@ -152,9 +246,10 @@ const TOUR_SCHEMA = {
             narration: { type: 'string' },
             confidence: { type: 'string', enum: ['established', 'approximate', 'disputed'] },
             confidence_note: { type: 'string' },
-            sources: { type: 'array', items: { type: 'string' } }
+            sources: { type: 'array', items: { type: 'string' } },
+            geocode_query: { type: 'string' }
           },
-          required: ['date', 'title', 'place', 'lat', 'lng', 'range_m', 'narration', 'confidence', 'confidence_note', 'sources'],
+          required: ['date', 'title', 'place', 'lat', 'lng', 'range_m', 'narration', 'confidence', 'confidence_note', 'sources', 'geocode_query'],
           additionalProperties: false
         }
       },
@@ -191,7 +286,7 @@ async function resolve(phrase) {
   return { candidates };
 }
 
-// ---------- 1b. phrase -> historical tour (Claude Sonnet: accuracy matters here) ----------
+// ---------- 1b. phrase -> historical tour, streamed ----------
 const TOUR_MODEL = 'claude-sonnet-5-5';
 
 const TOUR_SYSTEM = `You create historical map tours that a 3D globe will fly through stop by stop.
@@ -201,17 +296,34 @@ Fields:
 - span: years and region, e.g. "1816 to 1828, KwaZulu-Natal".
 - summary: two sentences on what the journey was and why it mattered.
 - caveat: one or two sentences on where the historical record comes from and how reliable it is.
-- date: as precise as the record allows, e.g. "1818", "c. 1787", "June 1824".
-- place: the modern location in plain words, e.g. "near present-day Ulundi, KwaZulu-Natal".
+- date: as precise as the record allows, e.g. "1818", "c. 1787", "June 1824", "334 BCE".
+- title (stop): the historical name of the event or place, e.g. "KwaBulawayo".
+- place: the modern location in plain words, e.g. "near present-day Eshowe, KwaZulu-Natal".
+- lat/lng: decimal degrees of the site itself.
 - range_m: camera distance in metres that frames the site (a battlefield ~6000, a town ~12000, a region ~150000).
 - narration: two or three plain, vivid sentences. No invented dialogue or inner thoughts.
 - confidence: established if historians broadly agree on what happened there; approximate if the event is accepted but the exact site or date is not; disputed if historians disagree or the main sources are partisan.
 - confidence_note: one short sentence on what exactly is uncertain. Empty string if established.
 - sources: real, well-known works you are confident exist, as "Author, Title (year)". Fewer is fine. Never invent a citation; give an empty array if unsure.
+- geocode_query: the MODERN name of the place, for a map search, only when the stop happened in that town, city or named landmark itself (e.g. "KwaDukuza, KwaZulu-Natal, South Africa"). Never a historical name. Empty string when the site is only near somewhere, or has no modern named place.
 Rules:
 - 5 to 12 stops, in chronological order, tracing the actual movement of the person, group or event.
 - Do not present legend or later myth as fact. If a famous story is probably legend, say so in the narration.
 If the request is not a historical journey that can be mapped, set error to a short reason and leave stops empty.`;
+
+const REGION_SYSTEM = `Given a request for a historical journey, name the region where it mostly took place, so a globe can fly there while the full tour is prepared. Answer in the required JSON format. lat/lng is the centre of the region; range_m is a camera distance that frames it (a province ~400000, a country ~1500000, a continent ~6000000).`;
+
+const REGION_SCHEMA = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    lat: { type: 'number' },
+    lng: { type: 'number' },
+    range_m: { type: 'number' }
+  },
+  required: ['name', 'lat', 'lng', 'range_m'],
+  additionalProperties: false
+};
 
 function validStop(s) {
   return (
@@ -222,57 +334,162 @@ function validStop(s) {
   );
 }
 
-function validTour(t) {
-  return (
-    t &&
-    typeof t.title === 'string' &&
-    Array.isArray(t.stops) &&
-    t.stops.filter(validStop).length >= 2
-  );
+function normStop(s) {
+  return {
+    date: String(s.date || ''),
+    title: s.title,
+    place: String(s.place || ''),
+    lat: s.lat,
+    lng: s.lng,
+    range_m: Number.isFinite(s.range_m) ? s.range_m : 8000,
+    narration: String(s.narration || ''),
+    confidence: ['established', 'approximate', 'disputed'].includes(s.confidence) ? s.confidence : 'approximate',
+    confidence_note: String(s.confidence_note || ''),
+    sources: Array.isArray(s.sources) ? s.sources.filter((x) => typeof x === 'string') : [],
+    geocode_query: String(s.geocode_query || ''),
+    snapped: false
+  };
 }
 
-async function resolveTour(phrase) {
-  const key = norm(phrase);
-  const hit = await cacheGet('tourCache', key);
-  if (hit) return hit;
+// One tour at a time. The background is the only writer of `activeTour` in storage;
+// the page reads it and listens for changes, so a tour survives the Earth tab loading.
+let job = null;
+let writeTimer = null;
 
-  const tour = await callClaude({ model: TOUR_MODEL, system: TOUR_SYSTEM, schema: TOUR_SCHEMA, phrase, maxTokens: 8000 });
-  if (tour.error) throw new Error(tour.error);
-  if (!validTour(tour)) throw new Error('That tour came back incomplete. Try rephrasing.');
+function persist(now) {
+  if (!job) return;
+  const j = job;
+  const write = () => chrome.storage.local.set({ activeTour: j.active });
+  if (now) {
+    clearTimeout(writeTimer);
+    writeTimer = null;
+    return write();
+  }
+  if (writeTimer) return; // a write is already scheduled and will include this change
+  writeTimer = setTimeout(() => {
+    writeTimer = null;
+    if (job === j) write();
+  }, 120);
+}
 
-  tour.stops = tour.stops.filter(validStop).slice(0, 12).map((s) => ({
-    ...s,
-    confidence: ['established', 'approximate', 'disputed'].includes(s.confidence) ? s.confidence : 'approximate',
-    sources: Array.isArray(s.sources) ? s.sources.filter((x) => typeof x === 'string') : []
-  }));
-  tour.request = phrase;
-  tour.generated = true;
-
-  await cacheSet('tourCache', key, tour);
-  return tour;
+// Geocode only modern place names, one request a second, and only accept a snap
+// that lands near Claude's own coordinates.
+async function snapQueue(j) {
+  if (j.snapping) return;
+  j.snapping = true;
+  try {
+    while (!j.aborted) {
+      const i = j.active.tour.stops.findIndex((s, k) => !j.snapTried.has(k));
+      if (i < 0) break;
+      j.snapTried.add(i);
+      const s = j.active.tour.stops[i];
+      if (!s.geocode_query) continue;
+      const geo = await geocode(s.geocode_query);
+      if (geo && distanceM(s, geo) <= Math.max(10000, s.range_m * 2)) {
+        s.lat = geo.lat;
+        s.lng = geo.lng;
+        s.snapped = true;
+        persist();
+      }
+      await new Promise((r) => setTimeout(r, 1100));
+    }
+  } finally {
+    j.snapping = false;
+  }
 }
 
 async function startTour(phrase, sender) {
-  const tour = await resolveTour(phrase);
   const tab = sender.tab || (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
+  let tabId;
+  if (tab && isEarth(tab.url)) tabId = tab.id;
+  else tabId = (await chrome.tabs.create({ url: 'https://earth.google.com/web/' })).id;
 
-  // Already on Earth: show the panel and fly in place.
-  if (tab && isEarth(tab.url)) {
-    await chrome.storage.local.set({ activeTour: { tour, index: -1, tabId: tab.id } });
-    try {
-      const r = await chrome.tabs.sendMessage(tab.id, { type: 'tourShow' });
-      if (r && r.ok) return { title: tour.title, stops: tour.stops.length };
-    } catch {
-      // no content script yet: fall through and load Earth fresh
-    }
-    await chrome.tabs.update(tab.id, { url: 'https://earth.google.com/web/' });
-    return { title: tour.title, stops: tour.stops.length };
+  runTour(phrase, tabId);
+  return { tabId, onEarth: !!(tab && isEarth(tab.url)) };
+}
+
+async function runTour(phrase, tabId) {
+  if (job) {
+    job.aborted = true;
+    job.ctrl.abort();
   }
+  const key = norm(phrase);
+  const ctrl = new AbortController();
+  const j = (job = {
+    ctrl,
+    aborted: false,
+    snapTried: new Set(),
+    active: { tabId, phrase, status: 'planning', started: Date.now(), index: -1, region: null, tour: { stops: [] } }
+  });
 
-  // Elsewhere: open Earth in a new tab; its content script picks the tour up on load.
-  const created = await chrome.tabs.create({ url: 'https://earth.google.com/web/' });
-  await chrome.storage.local.set({ activeTour: { tour, index: -1, tabId: created.id } });
-  return { title: tour.title, stops: tour.stops.length };
+  const cached = await cacheGet('tourCache', key);
+  if (cached) {
+    j.active.status = 'ready';
+    j.active.tour = cached;
+    await persist(true);
+    return;
+  }
+  await persist(true);
+
+  // Quick region guess so Earth starts flying while the tour is written.
+  callClaude({ model: MODEL, system: REGION_SYSTEM, schema: REGION_SCHEMA, phrase, maxTokens: 300, signal: ctrl.signal })
+    .then((r) => {
+      if (j.aborted || !Number.isFinite(r.lat) || !Number.isFinite(r.lng)) return;
+      j.active.region = r;
+      persist();
+    })
+    .catch(() => {});
+
+  try {
+    const text = await streamClaude(
+      { model: TOUR_MODEL, system: TOUR_SYSTEM, schema: TOUR_SCHEMA, phrase, maxTokens: 8000, signal: ctrl.signal },
+      (soFar) => {
+        if (j.aborted) return;
+        const p = partialTour(soFar);
+        const t = j.active.tour;
+        let changed = false;
+        for (const k of ['title', 'span', 'summary', 'caveat']) {
+          if (p[k] && p[k] !== t[k]) {
+            t[k] = p[k];
+            changed = true;
+          }
+        }
+        const fresh = p.stops.slice(t.stops.length).filter(validStop).map(normStop);
+        if (fresh.length) {
+          t.stops.push(...fresh);
+          changed = true;
+          snapQueue(j);
+        }
+        if (changed) persist();
+      }
+    );
+    if (j.aborted) return;
+
+    const final = parseJson(text);
+    const t = j.active.tour;
+    if (!t.stops.length) {
+      throw new Error(final.error || 'That tour came back empty. Try rephrasing.');
+    }
+    if (t.stops.length < 2) throw new Error('That tour came back with too few stops. Try rephrasing.');
+    for (const k of ['title', 'span', 'summary', 'caveat']) if (final[k]) t[k] = final[k];
+    t.request = phrase;
+    t.generated = true;
+    j.active.status = 'ready';
+    await persist(true);
+
+    // Cache once snapping has had its go, so replays get the snapped coordinates.
+    const waitSnap = async () => {
+      while (j.snapping) await new Promise((r) => setTimeout(r, 500));
+      await cacheSet('tourCache', key, t); // cache even if the tour was closed meanwhile
+    };
+    waitSnap();
+  } catch (err) {
+    if (j.aborted) return;
+    j.active.status = 'error';
+    j.active.error = err.message || String(err);
+    j.active.errorCode = err.code || null;
+    await persist(true);
+  }
 }
 
 async function getTour(sender) {
@@ -282,6 +499,11 @@ async function getTour(sender) {
 }
 
 async function setTourIndex(index, sender) {
+  if (job && sender.tab && job.active.tabId === sender.tab.id) {
+    job.active.index = index;
+    persist();
+    return true;
+  }
   const { activeTour } = await chrome.storage.local.get('activeTour');
   if (!activeTour || !sender.tab || activeTour.tabId !== sender.tab.id) return false;
   activeTour.index = index;
@@ -290,10 +512,22 @@ async function setTourIndex(index, sender) {
 }
 
 async function endTour(sender) {
+  if (job && sender.tab && job.active.tabId === sender.tab.id) {
+    job.aborted = true;
+    job.ctrl.abort();
+    job = null;
+  }
   const { activeTour } = await chrome.storage.local.get('activeTour');
   if (activeTour && sender.tab && activeTour.tabId === sender.tab.id) {
     await chrome.storage.local.remove('activeTour');
   }
+  return true;
+}
+
+async function retryTour(sender) {
+  const { activeTour } = await chrome.storage.local.get('activeTour');
+  if (!activeTour || !sender.tab || activeTour.tabId !== sender.tab.id) return false;
+  runTour(activeTour.phrase, sender.tab.id);
   return true;
 }
 
@@ -391,7 +625,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     startTour: () => startTour(msg.phrase, sender),
     getTour: () => getTour(sender),
     tourIndex: () => setTourIndex(msg.index, sender),
-    endTour: () => endTour(sender)
+    endTour: () => endTour(sender),
+    retryTour: () => retryTour(sender),
+    whoami: () => (sender.tab ? sender.tab.id : null)
   };
   const handler = handlers[msg?.type];
   if (!handler) return false;
