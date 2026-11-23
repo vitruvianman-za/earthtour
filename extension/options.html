@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Earth Tour settings</title>
+  <style>
+    :root { --text: #202124; --muted: #5f6368; --line: #dadce0; --bg: #fff; --field: #f8f9fa; --accent: #1a73e8; }
+    @media (prefers-color-scheme: dark) {
+      :root { --text: #e8eaed; --muted: #9aa0a6; --line: #3c4043; --bg: #202124; --field: #2a2b2e; --accent: #8ab4f8; }
+    }
+    body {
+      margin: 0; padding: 20px; min-width: 420px; background: var(--bg); color: var(--text);
+      font: 14px/1.5 "Google Sans", Roboto, system-ui, sans-serif;
+    }
+    h2 { font-size: 15px; margin: 0 0 4px; }
+    p { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+    section { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    section:last-child { border-bottom: 0; }
+    form { display: flex; gap: 8px; }
+    input {
+      flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line);
+      background: var(--field); color: var(--text); font: inherit;
+    }
+    input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    button {
+      padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line);
+      background: var(--field); color: var(--text); font: inherit; cursor: pointer;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+    #keyState { margin-top: 8px; font-size: 13px; color: var(--muted); }
+    #flash { margin-left: 8px; color: var(--accent); font-size: 13px; }
+    code { font-size: 12.5px; }
+  </style>
+</head>
+<body>
+  <section>
+    <h2>Anthropic API key</h2>
+    <p>Used to turn phrases into places. Stored only in this browser.</p>
+    <form id="keyForm">
+      <input id="key" type="password" placeholder="sk-ant-..." autocomplete="off">
+      <button class="primary" type="submit">Save</button>
+    </form>
+    <div id="keyState"></div>
+  </section>
+
+  <section>
+    <h2>Shortcuts</h2>
+    <p><code>Ctrl+K</code> on Maps or Earth opens the palette. <code>Alt+G</code> works anywhere. In the address bar, type <code>ej</code> then a space.</p>
+    <button id="shortcuts" type="button">Change Alt+G</button>
+  </section>
+
+  <section>
+    <h2>Cache</h2>
+    <p>Phrases and coordinates are cached so repeat jumps are instant.</p>
+    <button id="clearCache" type="button">Clear cache</button><span id="flash"></span>
+  </section>
+
+  <script src="options.js"></script>
+</body>
+</html>

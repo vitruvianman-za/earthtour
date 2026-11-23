@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "Earth Tour",
+  "version": "0.4.0",
+  "description": "Type a place or a historical journey and fly there in Google Earth or Google Maps. 'Follow Shaka's campaigns' becomes a stop-by-stop tour.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Earth Tour (Alt+G)"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "omnibox": {
+    "keyword": "ej"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://api.anthropic.com/*",
+    "https://nominatim.openstreetmap.org/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/maps*",
+        "https://www.google.co.za/maps*",
+        "https://maps.google.com/*",
+        "https://earth.google.com/*"
+      ],
+      "js": [
+        "palette-ui.js",
+        "tour-ui.js",
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "commands": {
+    "toggle-palette": {
+      "suggested_key": {
+        "default": "Alt+G",
+        "mac": "Alt+G"
+      },
+      "description": "Open Earth Tour"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/*.woff2"
+      ],
+      "matches": [
+        "https://earth.google.com/*"
+      ]
+    }
+  ]
+}
