@@ -2,8 +2,7 @@
 
 const MODEL = 'claude-haiku-5-5';
 
-const SYSTEM = `You turn a phrase into real places on Earth. Reply with ONLY a JSON object, no prose:
-{"candidates":[{"name":string,"lat":number,"lng":number,"range_m":number,"searchable":boolean,"note":string}]}
+const SYSTEM = `You turn a phrase into real places on Earth. Answer by calling the show_places tool.
 Rules:
 - Order candidates by how likely the user means them. Best answer first.
 - One candidate when the answer is clear (e.g. "highest mountain in the world").
@@ -13,7 +12,7 @@ Rules:
 - range_m: camera distance in metres that frames it well (building ~800, stadium ~1500, mountain ~15000, city ~30000, country ~1500000).
 - searchable: true if a map search by name would find it; false for ocean trenches, borders, arbitrary points.
 - note: under 12 words. Why this matches, or what sets it apart from the other candidates.
-If the phrase is not about a place at all, reply {"error":"short reason"}.`;
+If the phrase is not about a place at all, set error to a short reason and leave candidates empty.`;
 
 // ---------- helpers ----------
 const MAPS_RE = /^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+\/)/;
@@ -59,6 +58,111 @@ async function cacheSet(bucket, key, value) {
   await chrome.storage.local.set({ [bucket]: c });
 }
 
+
+// ---------- calling Claude ----------
+// We force a tool call with a JSON schema instead of asking for JSON as text. The API
+// then returns an already-parsed object, so a stray quote in a narration can't break it.
+async function callClaude({ model, system, tool, phrase, maxTokens }) {
+  const { apiKey } = await chrome.storage.local.get('apiKey');
+  if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      system,
+      tools: [tool],
+      tool_choice: { type: 'tool', name: tool.name },
+      messages: [{ role: 'user', content: phrase }]
+    })
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) throw codedError('NO_KEY', 'Your API key was rejected. Check it in Settings.');
+    if (res.status === 429) throw new Error('Too many requests right now. Wait a moment and try again.');
+    if (res.status >= 500) throw new Error('Claude is having trouble right now. Try again in a minute.');
+    const body = await res.text();
+    throw new Error(`API ${res.status}: ${body.slice(0, 140)}`);
+  }
+
+  const data = await res.json();
+  if (data.stop_reason === 'max_tokens') {
+    throw new Error('The answer was cut off before it finished. Try a narrower request.');
+  }
+  const block = (data.content || []).find((b) => b.type === 'tool_use' && b.name === tool.name);
+  if (!block || typeof block.input !== 'object') {
+    throw new Error('Claude sent back something unexpected. Try again.');
+  }
+  return block.input;
+}
+
+const PLACES_TOOL = {
+  name: 'show_places',
+  description: 'Return the places that match the phrase, best first.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      candidates: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            lat: { type: 'number' },
+            lng: { type: 'number' },
+            range_m: { type: 'number' },
+            searchable: { type: 'boolean' },
+            note: { type: 'string' }
+          },
+          required: ['name', 'lat', 'lng', 'range_m', 'searchable', 'note']
+        }
+      },
+      error: { type: 'string', description: 'Only when the phrase is not about a place.' }
+    }
+  }
+};
+
+const TOUR_TOOL = {
+  name: 'plan_tour',
+  description: 'Return the historical tour.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      title: { type: 'string' },
+      span: { type: 'string' },
+      summary: { type: 'string' },
+      caveat: { type: 'string' },
+      stops: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            date: { type: 'string' },
+            title: { type: 'string' },
+            place: { type: 'string' },
+            lat: { type: 'number' },
+            lng: { type: 'number' },
+            range_m: { type: 'number' },
+            narration: { type: 'string' },
+            confidence: { type: 'string', enum: ['established', 'approximate', 'disputed'] },
+            confidence_note: { type: 'string' },
+            sources: { type: 'array', items: { type: 'string' } }
+          },
+          required: ['date', 'title', 'place', 'lat', 'lng', 'range_m', 'narration', 'confidence', 'confidence_note', 'sources']
+        }
+      },
+      error: { type: 'string', description: 'Only when the request is not a mappable historical journey.' }
+    }
+  }
+};
+
 // ---------- 1. phrase -> candidates (Claude) ----------
 function validCandidate(c) {
   return (
@@ -76,37 +180,7 @@ async function resolve(phrase) {
   const hit = await cacheGet('phraseCache', key);
   if (hit) return { candidates: hit, cached: true };
 
-  const { apiKey } = await chrome.storage.local.get('apiKey');
-  if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 800,
-      system: SYSTEM,
-      messages: [{ role: 'user', content: phrase }]
-    })
-  });
-
-  if (!res.ok) {
-    if (res.status === 401) throw codedError('NO_KEY', 'Your API key was rejected. Check it in Settings.');
-    const body = await res.text();
-    throw new Error(`API ${res.status}: ${body.slice(0, 140)}`);
-  }
-
-  const data = await res.json();
-  const text = (data.content || []).map((b) => b.text || '').join('');
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not read places from the response.');
-
-  const parsed = JSON.parse(match[0]);
+  const parsed = await callClaude({ model: MODEL, system: SYSTEM, tool: PLACES_TOOL, phrase, maxTokens: 1000 });
   if (parsed.error) throw new Error(parsed.error);
 
   const candidates = (parsed.candidates || []).filter(validCandidate).slice(0, 5);
@@ -120,11 +194,7 @@ async function resolve(phrase) {
 const TOUR_MODEL = 'claude-sonnet-5-5';
 
 const TOUR_SYSTEM = `You create historical map tours that a 3D globe will fly through stop by stop.
-Reply with ONLY a JSON object, no prose:
-{"title": string, "span": string, "summary": string, "caveat": string,
- "stops": [{"date": string, "title": string, "place": string, "lat": number, "lng": number, "range_m": number,
-            "narration": string, "confidence": "established" | "approximate" | "disputed",
-            "confidence_note": string, "sources": [string]}]}
+Answer by calling the plan_tour tool.
 Fields:
 - title: short name of the journey, e.g. "Shaka's rise and campaigns".
 - span: years and region, e.g. "1816 to 1828, KwaZulu-Natal".
@@ -140,7 +210,7 @@ Fields:
 Rules:
 - 5 to 12 stops, in chronological order, tracing the actual movement of the person, group or event.
 - Do not present legend or later myth as fact. If a famous story is probably legend, say so in the narration.
-If the request is not a historical journey that can be mapped, reply {"error": "short reason"}.`;
+If the request is not a historical journey that can be mapped, set error to a short reason and leave stops empty.`;
 
 function validStop(s) {
   return (
@@ -165,37 +235,7 @@ async function resolveTour(phrase) {
   const hit = await cacheGet('tourCache', key);
   if (hit) return hit;
 
-  const { apiKey } = await chrome.storage.local.get('apiKey');
-  if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: TOUR_MODEL,
-      max_tokens: 6000,
-      system: TOUR_SYSTEM,
-      messages: [{ role: 'user', content: phrase }]
-    })
-  });
-
-  if (!res.ok) {
-    if (res.status === 401) throw codedError('NO_KEY', 'Your API key was rejected. Check it in Settings.');
-    const body = await res.text();
-    throw new Error(`API ${res.status}: ${body.slice(0, 140)}`);
-  }
-
-  const data = await res.json();
-  const text = (data.content || []).map((b) => b.text || '').join('');
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not read a tour from the response.');
-
-  const tour = JSON.parse(match[0]);
+  const tour = await callClaude({ model: TOUR_MODEL, system: TOUR_SYSTEM, tool: TOUR_TOOL, phrase, maxTokens: 8000 });
   if (tour.error) throw new Error(tour.error);
   if (!validTour(tour)) throw new Error('That tour came back incomplete. Try rephrasing.');
 
