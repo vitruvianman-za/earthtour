@@ -2,7 +2,7 @@
 
 const MODEL = 'claude-haiku-5-5';
 
-const SYSTEM = `You turn a phrase into real places on Earth. Answer by calling the show_places tool.
+const SYSTEM = `You turn a phrase into real places on Earth. Answer in the required JSON format.
 Rules:
 - Order candidates by how likely the user means them. Best answer first.
 - One candidate when the answer is clear (e.g. "highest mountain in the world").
@@ -60,9 +60,9 @@ async function cacheSet(bucket, key, value) {
 
 
 // ---------- calling Claude ----------
-// We force a tool call with a JSON schema instead of asking for JSON as text. The API
-// then returns an already-parsed object, so a stray quote in a narration can't break it.
-async function callClaude({ model, system, tool, phrase, maxTokens }) {
+// Structured outputs: the request carries a JSON schema and the API constrains the reply
+// to it, so the JSON is always valid (a stray quote in a narration can't break it).
+async function callClaude({ model, system, schema, phrase, maxTokens }) {
   const { apiKey } = await chrome.storage.local.get('apiKey');
   if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
 
@@ -78,8 +78,7 @@ async function callClaude({ model, system, tool, phrase, maxTokens }) {
       model,
       max_tokens: maxTokens,
       system,
-      tools: [tool],
-      tool_choice: { type: 'tool', name: tool.name },
+      output_config: { format: { type: 'json_schema', schema } },
       messages: [{ role: 'user', content: phrase }]
     })
   });
@@ -96,17 +95,18 @@ async function callClaude({ model, system, tool, phrase, maxTokens }) {
   if (data.stop_reason === 'max_tokens') {
     throw new Error('The answer was cut off before it finished. Try a narrower request.');
   }
-  const block = (data.content || []).find((b) => b.type === 'tool_use' && b.name === tool.name);
-  if (!block || typeof block.input !== 'object') {
+  if (data.stop_reason === 'refusal') {
+    throw new Error('Claude declined that request. Try phrasing it differently.');
+  }
+  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  try {
+    return JSON.parse(text);
+  } catch {
     throw new Error('Claude sent back something unexpected. Try again.');
   }
-  return block.input;
 }
 
-const PLACES_TOOL = {
-  name: 'show_places',
-  description: 'Return the places that match the phrase, best first.',
-  input_schema: {
+const PLACES_SCHEMA = {
     type: 'object',
     properties: {
       candidates: {
@@ -121,18 +121,17 @@ const PLACES_TOOL = {
             searchable: { type: 'boolean' },
             note: { type: 'string' }
           },
-          required: ['name', 'lat', 'lng', 'range_m', 'searchable', 'note']
+          required: ['name', 'lat', 'lng', 'range_m', 'searchable', 'note'],
+          additionalProperties: false
         }
       },
       error: { type: 'string', description: 'Only when the phrase is not about a place.' }
-    }
-  }
+    },
+    required: ['candidates'],
+    additionalProperties: false
 };
 
-const TOUR_TOOL = {
-  name: 'plan_tour',
-  description: 'Return the historical tour.',
-  input_schema: {
+const TOUR_SCHEMA = {
     type: 'object',
     properties: {
       title: { type: 'string' },
@@ -155,12 +154,14 @@ const TOUR_TOOL = {
             confidence_note: { type: 'string' },
             sources: { type: 'array', items: { type: 'string' } }
           },
-          required: ['date', 'title', 'place', 'lat', 'lng', 'range_m', 'narration', 'confidence', 'confidence_note', 'sources']
+          required: ['date', 'title', 'place', 'lat', 'lng', 'range_m', 'narration', 'confidence', 'confidence_note', 'sources'],
+          additionalProperties: false
         }
       },
       error: { type: 'string', description: 'Only when the request is not a mappable historical journey.' }
-    }
-  }
+    },
+    required: ['title', 'span', 'summary', 'caveat', 'stops'],
+    additionalProperties: false
 };
 
 // ---------- 1. phrase -> candidates (Claude) ----------
@@ -180,7 +181,7 @@ async function resolve(phrase) {
   const hit = await cacheGet('phraseCache', key);
   if (hit) return { candidates: hit, cached: true };
 
-  const parsed = await callClaude({ model: MODEL, system: SYSTEM, tool: PLACES_TOOL, phrase, maxTokens: 1000 });
+  const parsed = await callClaude({ model: MODEL, system: SYSTEM, schema: PLACES_SCHEMA, phrase, maxTokens: 1000 });
   if (parsed.error) throw new Error(parsed.error);
 
   const candidates = (parsed.candidates || []).filter(validCandidate).slice(0, 5);
@@ -194,7 +195,7 @@ async function resolve(phrase) {
 const TOUR_MODEL = 'claude-sonnet-5-5';
 
 const TOUR_SYSTEM = `You create historical map tours that a 3D globe will fly through stop by stop.
-Answer by calling the plan_tour tool.
+Answer in the required JSON format.
 Fields:
 - title: short name of the journey, e.g. "Shaka's rise and campaigns".
 - span: years and region, e.g. "1816 to 1828, KwaZulu-Natal".
@@ -235,7 +236,7 @@ async function resolveTour(phrase) {
   const hit = await cacheGet('tourCache', key);
   if (hit) return hit;
 
-  const tour = await callClaude({ model: TOUR_MODEL, system: TOUR_SYSTEM, tool: TOUR_TOOL, phrase, maxTokens: 8000 });
+  const tour = await callClaude({ model: TOUR_MODEL, system: TOUR_SYSTEM, schema: TOUR_SCHEMA, phrase, maxTokens: 8000 });
   if (tour.error) throw new Error(tour.error);
   if (!validTour(tour)) throw new Error('That tour came back incomplete. Try rephrasing.');
 
