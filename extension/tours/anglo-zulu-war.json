@@ -1,0 +1,151 @@
+{
+ "id": "anglo-zulu-war",
+ "title": "The Anglo-Zulu War",
+ "span": "1878 to 1879, Zululand",
+ "summary": "Britain invaded the Zulu kingdom to bring it into a planned confederation of South Africa. Despite a stunning Zulu victory at Isandlwana, the kingdom was defeated within seven months.",
+ "caveat": "Unusually well documented: British military reports, soldiers' letters and later Zulu testimony collected by historians. Casualty figures for the Zulu side are estimates.",
+ "keywords": [
+  "anglo-zulu",
+  "isandlwana",
+  "rorke",
+  "cetshwayo",
+  "ulundi",
+  "zulu war"
+ ],
+ "stops": [
+  {
+   "date": "11 December 1878",
+   "title": "The ultimatum",
+   "place": "Lower Thukela, beside Fort Pearson",
+   "lat": -29.21372222,
+   "lng": 31.43302778,
+   "range_m": 3000,
+   "narration": "Under a fig tree on the Thukela River, British officials read terms to King Cetshwayo's envoys that he could not accept, including disbanding his army.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Jeff Guy, The Destruction of the Zulu Kingdom (1979)",
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "22 January 1879",
+   "title": "Isandlwana",
+   "place": "Isandlwana, KwaZulu-Natal",
+   "lat": -28.35638889,
+   "lng": 30.6525,
+   "range_m": 5000,
+   "narration": "The main Zulu army surprised a British camp beneath this sphinx-shaped hill. More than 1,300 men on the British side were killed, the worst defeat of a British army by an African force.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)",
+    "Ian Knight, Zulu Rising (2010)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "22 to 23 January 1879",
+   "title": "Rorke's Drift",
+   "place": "Rorke's Drift, KwaZulu-Natal",
+   "lat": -28.35805556,
+   "lng": 30.53666667,
+   "range_m": 2500,
+   "narration": "The invasion had crossed the Buffalo River here. Hours after Isandlwana, about 150 soldiers held the mission station through the night against several thousand Zulu reserves.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Ian Knight, Zulu Rising (2010)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "28 March 1879",
+   "title": "Hlobane",
+   "place": "Hlobane mountain, KwaZulu-Natal",
+   "lat": -27.69888889,
+   "lng": 30.95,
+   "range_m": 8000,
+   "narration": "A British raid on this flat-topped mountain was caught by the arrival of the main Zulu army and routed.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "29 March 1879",
+   "title": "Kambula",
+   "place": "Kambula, KwaZulu-Natal",
+   "lat": -27.69289391,
+   "lng": 30.6727024,
+   "range_m": 4000,
+   "narration": "The next day, the same Zulu army attacked a fortified British camp and was beaten off with heavy losses. Many historians see this as the turning point.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)",
+    "Ian Knight, Zulu Rising (2010)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "2 April 1879",
+   "title": "Gingindlovu",
+   "place": "Gingindlovu, KwaZulu-Natal",
+   "lat": -29.0117,
+   "lng": 31.579118,
+   "range_m": 5000,
+   "narration": "A relief column defeated a Zulu force here and went on to lift the siege of a British garrison at Eshowe.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "4 July 1879",
+   "title": "Ulundi",
+   "place": "Ulundi, KwaZulu-Natal",
+   "lat": -28.31111111,
+   "lng": 31.42638889,
+   "range_m": 5000,
+   "narration": "A British square of infantry, artillery and Gatling guns broke the last major Zulu attack. Cetshwayo's royal homestead at oNdini was burned.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Kingdom in Crisis: The Zulu Response to the British Invasion of 1879 (1992)",
+    "Jeff Guy, The Destruction of the Zulu Kingdom (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "28 August 1879",
+   "title": "Cetshwayo's capture",
+   "place": "Ngome Forest, KwaZulu-Natal",
+   "lat": -27.83333333,
+   "lng": 31.41666667,
+   "range_m": 15000,
+   "narration": "The king was captured in the Ngome forest and sent into exile. Britain divided the kingdom into 13 chiefdoms, setting off years of civil war.",
+   "confidence": "approximate",
+   "confidence_note": "The exact capture site within the forest area is approximate.",
+   "sources": [
+    "Jeff Guy, The Destruction of the Zulu Kingdom (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

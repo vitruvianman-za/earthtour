@@ -1,0 +1,117 @@
+{
+ "id": "diamonds-and-gold",
+ "title": "Diamonds and gold",
+ "span": "1867 to 1896, South Africa",
+ "summary": "Within twenty years, diamonds at Kimberley and gold on the Witwatersrand turned a farming region into an industrial economy. Mining built Johannesburg, the migrant labour system and the fortunes behind the next war.",
+ "caveat": "Well documented in company records, colonial reports and newspapers. The experiences of Black miners are recorded less fully than those of owners and officials.",
+ "keywords": [
+  "big hole",
+  "witwatersrand",
+  "kimberley diamond",
+  "south african gold",
+  "diamonds and gold"
+ ],
+ "stops": [
+  {
+   "date": "1867",
+   "title": "The Eureka diamond",
+   "place": "near Hopetown, Northern Cape",
+   "lat": -29.62583333,
+   "lng": 24.08555556,
+   "range_m": 12000,
+   "narration": "A boy named Erasmus Jacobs picked up a shiny pebble on his family's farm near the Orange River. It turned out to be a 21-carat diamond.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1871",
+   "title": "The Big Hole",
+   "place": "Kimberley, Northern Cape",
+   "lat": -28.73888889,
+   "lng": 24.75888889,
+   "range_m": 2500,
+   "narration": "Diamonds were found on a small hill, and thousands of diggers turned it into a pit. By 1888 Cecil Rhodes had merged the claims into De Beers, and Black workers were housed in closed compounds.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)",
+    "Rob Turrell, Capital and Labour on the Kimberley Diamond Fields, 1871-1890 (1987)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1873",
+   "title": "Pilgrim's Rest",
+   "place": "Pilgrim's Rest, Mpumalanga",
+   "lat": -24.90777778,
+   "lng": 30.75666667,
+   "range_m": 5000,
+   "narration": "Alluvial gold in this valley drew diggers to the eastern escarpment. The village is preserved much as the mining camp left it.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1884",
+   "title": "Barberton",
+   "place": "Barberton, Mpumalanga",
+   "lat": -25.78611111,
+   "lng": 31.05305556,
+   "range_m": 6000,
+   "narration": "A gold boom here created the region's first stock exchange. It faded fast, but it trained the prospectors who went to the Witwatersrand.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1886",
+   "title": "The Main Reef",
+   "place": "Langlaagte, west of central Johannesburg",
+   "lat": -26.20444444,
+   "lng": 28.04555556,
+   "range_m": 12000,
+   "narration": "Prospectors found the outcrop of the Main Reef on the farm Langlaagte. Johannesburg was laid out months later and grew into South Africa's largest city.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows central Johannesburg; Langlaagte lies a few kilometres west.",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)",
+    "Charles van Onselen, New Babylon, New Nineveh (1982)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "2 January 1896",
+   "title": "The Jameson Raid ends",
+   "place": "Doornkop, west of Johannesburg",
+   "lat": -26.23277778,
+   "lng": 27.78333333,
+   "range_m": 6000,
+   "narration": "A force backed by Rhodes tried to spark an uprising of foreign miners against the Transvaal government and surrendered here. Rhodes resigned, and trust between Briton and Boer collapsed.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Martin Meredith, Diamonds, Gold and War (2007)",
+    "Thomas Pakenham, The Boer War (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

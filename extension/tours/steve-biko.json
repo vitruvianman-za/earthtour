@@ -1,0 +1,168 @@
+{
+ "id": "steve-biko",
+ "title": "Steve Biko",
+ "span": "1946 to 1977, South Africa",
+ "summary": "Steve Biko led the Black Consciousness Movement, which told Black South Africans to reject inferiority and organise for themselves. He died in police custody at 30.",
+ "caveat": "His own writings, a biography by a close friend, inquest records and the Truth and Reconciliation Commission document his life and death in detail. Several towns on this route have since been renamed.",
+ "keywords": [
+  "biko",
+  "black consciousness",
+  "saso"
+ ],
+ "stops": [
+  {
+   "date": "18 December 1946",
+   "title": "Born in Tarkastad",
+   "place": "Tarkastad, Eastern Cape",
+   "lat": -32.0075,
+   "lng": 26.26,
+   "range_m": 6000,
+   "narration": "Bantu Stephen Biko was born here and raised in Ginsberg township, outside King William's Town, by his mother after his father's early death.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Xolela Mangcu, Biko: A Biography (2012)",
+    "Donald Woods, Biko (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1963",
+   "title": "Expelled from Lovedale",
+   "place": "Alice, Eastern Cape",
+   "lat": -32.78916667,
+   "lng": 26.835,
+   "range_m": 4000,
+   "narration": "At Lovedale College, Biko was questioned by police after his brother's arrest and expelled. He later said it was the start of his hostility to authority.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Xolela Mangcu, Biko: A Biography (2012)",
+    "Donald Woods, Biko (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1964 to 1965",
+   "title": "St Francis College",
+   "place": "Mariannhill, near Durban",
+   "lat": -29.85,
+   "lng": 30.83333333,
+   "range_m": 4000,
+   "narration": "He finished school at this Catholic boarding school, where he read widely and debated liberalism and politics.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Xolela Mangcu, Biko: A Biography (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1966",
+   "title": "Medical school in Durban",
+   "place": "Wentworth, Durban",
+   "lat": -29.91666667,
+   "lng": 31.0,
+   "range_m": 4000,
+   "narration": "Biko studied medicine in the \"non-European\" section of the University of Natal and lived in the student residence at Wentworth, where his politics took shape.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Xolela Mangcu, Biko: A Biography (2012)",
+    "Donald Woods, Biko (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "July 1969",
+   "title": "SASO launched",
+   "place": "Turfloop, present-day University of Limpopo",
+   "lat": -23.886,
+   "lng": 29.738,
+   "range_m": 5000,
+   "narration": "Biko led Black students out of the white-led student union to found the South African Students' Organisation, launched at a conference here.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Steve Biko, I Write What I Like (1978)",
+    "Xolela Mangcu, Biko: A Biography (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1973",
+   "title": "Banned to King William's Town",
+   "place": "Qonce, formerly King William's Town",
+   "lat": -32.88333333,
+   "lng": 27.4,
+   "range_m": 6000,
+   "narration": "The government banned Biko and confined him to his home district. He kept working, setting up community projects including the Zanempilo clinic nearby.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Donald Woods, Biko (1978)",
+    "Xolela Mangcu, Biko: A Biography (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "18 August 1977",
+   "title": "Arrested at a roadblock",
+   "place": "near Makhanda, formerly Grahamstown",
+   "lat": -33.31,
+   "lng": 26.52666667,
+   "range_m": 12000,
+   "narration": "Biko and Peter Jones were stopped at a police roadblock outside the town and taken into detention.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows Makhanda; the roadblock was outside the town.",
+   "sources": [
+    "Donald Woods, Biko (1978)",
+    "Truth and Reconciliation Commission of South Africa Report (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "September 1977",
+   "title": "Detained in Port Elizabeth",
+   "place": "Gqeberha, formerly Port Elizabeth",
+   "lat": -33.95805556,
+   "lng": 25.6,
+   "range_m": 8000,
+   "narration": "Held naked and shackled in security police offices, Biko suffered a severe head injury during interrogation.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Donald Woods, Biko (1978)",
+    "Truth and Reconciliation Commission of South Africa Report (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "12 September 1977",
+   "title": "Dies in Pretoria",
+   "place": "Kgosi Mampuru II prison, Pretoria",
+   "lat": -25.7612,
+   "lng": 28.1816,
+   "range_m": 2000,
+   "narration": "Police drove him more than 1,000 kilometres to Pretoria in the back of a vehicle, and he died in a prison cell. An inquest found no one responsible; in 1999 the Truth and Reconciliation Commission refused amnesty to the officers involved.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Donald Woods, Biko (1978)",
+    "Truth and Reconciliation Commission of South Africa Report (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

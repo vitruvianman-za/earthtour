@@ -1,0 +1,149 @@
+{
+ "id": "shaka",
+ "title": "Shaka's rise and campaigns",
+ "span": "c. 1787 to 1828, KwaZulu-Natal",
+ "summary": "Shaka kaSenzangakhona turned the small Zulu chiefdom into the dominant power between the Phongolo and Thukela rivers in about a decade. His wars and the upheavals around them reshaped south-east Africa.",
+ "caveat": "Almost everything written about Shaka comes from oral traditions recorded decades later and from the accounts of European traders who wanted him to look either fearsome or friendly. Dates before 1824 are approximate, and many famous stories are probably legend.",
+ "keywords": [
+  "shaka",
+  "zulu kingdom",
+  "kwabulawayo"
+ ],
+ "stops": [
+  {
+   "date": "c. 1787",
+   "title": "Born to Nandi",
+   "place": "near present-day Melmoth, KwaZulu-Natal",
+   "lat": -28.58333333,
+   "lng": 31.38333333,
+   "range_m": 25000,
+   "narration": "Shaka was born to Senzangakhona, chief of the small Zulu clan, and Nandi of the Langeni. The famous story of a bullied, exiled childhood comes mostly from much later tellings.",
+   "confidence": "approximate",
+   "confidence_note": "His birth year and birthplace are estimates; the marker shows the general area.",
+   "sources": [
+    "Carolyn Hamilton, Terrific Majesty (1998)",
+    "Dan Wylie, Myth of Iron: Shaka in History (2006)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1810",
+   "title": "Serves under Dingiswayo",
+   "place": "Mthethwa country, near present-day Mtubatuba",
+   "lat": -28.41666667,
+   "lng": 32.18333333,
+   "range_m": 30000,
+   "narration": "Shaka rose as a warrior in the army of Dingiswayo, ruler of the Mthethwa. When Senzangakhona died around 1816, Dingiswayo backed Shaka to take the Zulu chieftaincy.",
+   "confidence": "approximate",
+   "confidence_note": "The timeline of his service is reconstructed from oral sources.",
+   "sources": [
+    "John Laband, Rope of Sand (1995)",
+    "Dan Wylie, Myth of Iron: Shaka in History (2006)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1816",
+   "title": "Takes the Zulu chieftaincy",
+   "place": "eMakhosini valley, KwaZulu-Natal",
+   "lat": -28.51666667,
+   "lng": 31.66666667,
+   "range_m": 15000,
+   "narration": "Shaka took control of the Zulu in the eMakhosini, the valley of the Zulu kings, after his half-brother was killed. He began reorganising the army into age regiments.",
+   "confidence": "approximate",
+   "confidence_note": "The year is approximate; the military innovations credited to him are debated.",
+   "sources": [
+    "Carolyn Hamilton, Terrific Majesty (1998)",
+    "John Laband, Rope of Sand (1995)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1818",
+   "title": "Battle of Gqokli Hill",
+   "place": "near present-day Ulundi, KwaZulu-Natal",
+   "lat": -28.31666667,
+   "lng": 31.41666667,
+   "range_m": 8000,
+   "narration": "Outnumbered by Zwide's Ndwandwe, Shaka's regiments are said to have held a hilltop and driven the attackers off. It is remembered as the first great test of the new army.",
+   "confidence": "disputed",
+   "confidence_note": "The year, the exact hill and the numbers involved are all debated; the marker shows Ulundi.",
+   "sources": [
+    "John Laband, Rope of Sand (1995)",
+    "Dan Wylie, Myth of Iron: Shaka in History (2006)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1819",
+   "title": "Battle of the Mhlatuze",
+   "place": "Mhlatuze River, KwaZulu-Natal",
+   "lat": -28.8333,
+   "lng": 32.0,
+   "range_m": 25000,
+   "narration": "After Dingiswayo's death, Shaka defeated the Ndwandwe at the Mhlatuze River. Zwide's people scattered northwards, and the Zulu became the strongest power in the region.",
+   "confidence": "approximate",
+   "confidence_note": "The site and date come from oral tradition.",
+   "sources": [
+    "John Laband, Rope of Sand (1995)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1820",
+   "title": "KwaBulawayo",
+   "place": "near present-day Eshowe, KwaZulu-Natal",
+   "lat": -28.88833333,
+   "lng": 31.44833333,
+   "range_m": 8000,
+   "narration": "Shaka's great royal homestead near Eshowe became the centre of the kingdom. Not to be confused with Bulawayo in Zimbabwe, which was named after it decades later.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows Eshowe; the homestead site lies nearby.",
+   "sources": [
+    "Carolyn Hamilton, Terrific Majesty (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1824",
+   "title": "Traders at Port Natal",
+   "place": "Port Natal, present-day Durban",
+   "lat": -29.88333333,
+   "lng": 31.05,
+   "range_m": 12000,
+   "narration": "A party of British traders led by Francis Farewell settled at Port Natal with Shaka's permission. Their later writings shaped how the world saw him, often for their own ends.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Carolyn Hamilton, Terrific Majesty (1998)",
+    "Dan Wylie, Myth of Iron: Shaka in History (2006)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "September 1828",
+   "title": "Killed at Dukuza",
+   "place": "KwaDukuza, KwaZulu-Natal",
+   "lat": -29.33333333,
+   "lng": 31.29166667,
+   "range_m": 6000,
+   "narration": "Shaka was assassinated at his last royal homestead by his half-brothers Dingane and Mhlangana. Dingane became king.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "John Laband, Rope of Sand (1995)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

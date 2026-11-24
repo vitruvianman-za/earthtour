@@ -1,0 +1,157 @@
+[
+ {
+  "id": "mandela",
+  "title": "Mandela's long walk",
+  "span": "1918 to 2013, South Africa",
+  "keywords": [
+   "mandela",
+   "madiba",
+   "long walk"
+  ],
+  "stops": 14
+ },
+ {
+  "id": "shaka",
+  "title": "Shaka's rise and campaigns",
+  "span": "c. 1787 to 1828, KwaZulu-Natal",
+  "keywords": [
+   "shaka",
+   "zulu kingdom",
+   "kwabulawayo"
+  ],
+  "stops": 8
+ },
+ {
+  "id": "moshoeshoe",
+  "title": "Moshoeshoe and the founding of Lesotho",
+  "span": "c. 1786 to 1870, Lesotho and the Free State",
+  "keywords": [
+   "moshoeshoe",
+   "moshesh",
+   "lesotho",
+   "basotho",
+   "thaba bosiu"
+  ],
+  "stops": 8
+ },
+ {
+  "id": "mzilikazi",
+  "title": "Mzilikazi's migration",
+  "span": "c. 1822 to 1868, from Zululand to Zimbabwe",
+  "keywords": [
+   "mzilikazi",
+   "ndebele",
+   "matabele"
+  ],
+  "stops": 8
+ },
+ {
+  "id": "anglo-zulu-war",
+  "title": "The Anglo-Zulu War",
+  "span": "1878 to 1879, Zululand",
+  "keywords": [
+   "anglo-zulu",
+   "isandlwana",
+   "rorke",
+   "cetshwayo",
+   "ulundi",
+   "zulu war"
+  ],
+  "stops": 8
+ },
+ {
+  "id": "diamonds-and-gold",
+  "title": "Diamonds and gold",
+  "span": "1867 to 1896, South Africa",
+  "keywords": [
+   "big hole",
+   "witwatersrand",
+   "kimberley diamond",
+   "south african gold",
+   "diamonds and gold"
+  ],
+  "stops": 6
+ },
+ {
+  "id": "south-african-war",
+  "title": "The South African War",
+  "span": "1899 to 1902, South Africa",
+  "keywords": [
+   "boer war",
+   "anglo-boer",
+   "south african war",
+   "mafeking",
+   "spion kop",
+   "spioenkop"
+  ],
+  "stops": 9
+ },
+ {
+  "id": "june-16",
+  "title": "June 16, 1976",
+  "span": "June to August 1976, Soweto and beyond",
+  "keywords": [
+   "june 16",
+   "soweto uprising",
+   "soweto 1976",
+   "hector pieterson"
+  ],
+  "stops": 6
+ },
+ {
+  "id": "steve-biko",
+  "title": "Steve Biko",
+  "span": "1946 to 1977, South Africa",
+  "keywords": [
+   "biko",
+   "black consciousness",
+   "saso"
+  ],
+  "stops": 9
+ },
+ {
+  "id": "human-origins",
+  "title": "Human origins",
+  "span": "about 3.7 million to 44,000 years ago, South Africa",
+  "keywords": [
+   "human origins",
+   "cradle of humankind",
+   "sterkfontein",
+   "taung",
+   "blombos"
+  ],
+  "stops": 8
+ },
+ {
+  "id": "mapungubwe",
+  "title": "Mapungubwe",
+  "span": "c. 900 to 1450, the Limpopo valley",
+  "keywords": [
+   "mapungubwe",
+   "golden rhino",
+   "limpopo kingdom"
+  ],
+  "stops": 6
+ },
+ {
+  "id": "dias",
+  "title": "Dias round the Cape",
+  "span": "1487 to 1488, Lisbon to the Eastern Cape",
+  "keywords": [
+   "bartolomeu",
+   "dias round",
+   "dias voyage"
+  ],
+  "stops": 6
+ },
+ {
+  "id": "krotoa",
+  "title": "Krotoa and the early Cape",
+  "span": "1652 to 1674, Table Bay",
+  "keywords": [
+   "krotoa",
+   "early cape"
+  ],
+  "stops": 7
+ }
+]

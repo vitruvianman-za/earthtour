@@ -32,6 +32,24 @@ The map is the interface. Nothing sits in a corner competing with it.
   <img src="docs/notes.png" width="49%" alt="Notes open: what's uncertain, sources, about the record, and a legend of solid, dashed and dotted lines">
 </p>
 
+## Preloaded tours
+
+Thirteen researched tours of South African and southern African history ship with the extension. They open instantly, with no API call, and are labelled as researched rather than AI-generated.
+
+| Kingdoms | Colonial era | Struggle | Deep time and first contact |
+|---|---|---|---|
+| Mapungubwe | The Anglo-Zulu War | Mandela's long walk | Human origins |
+| Shaka's rise and campaigns | Diamonds and gold | June 16, 1976 | Dias round the Cape |
+| Moshoeshoe and the founding of Lesotho | The South African War | Steve Biko | Krotoa and the early Cape |
+| Mzilikazi's migration | | | |
+
+They're listed when you open the search bar, filtered as you type, and used automatically when a typed journey names one ("follow Shaka's campaigns").
+
+- **Sources:** every stop cites published works: biographies, histories, primary records and, for human origins, the scientific papers behind each date.
+- **Coordinates** come from Wikipedia's coordinate data. Where a site has no published coordinates, the stop sits at the nearest verified place and is marked *approximate*, with a note saying so.
+- **Not yet reviewed by a historian.** The tours say so. Corrections are welcome.
+- **Editing:** tours are built from `tools/build_tours.py`. Edit it and run `python3 tools/build_tours.py extension/tours`.
+
 ## Using it
 
 | | |

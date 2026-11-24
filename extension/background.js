@@ -416,17 +416,47 @@ async function snapQueue(j) {
   }
 }
 
-async function startTour(phrase, sender) {
+// ---------- preloaded tours ----------
+// Researched tours shipped with the extension (tours/*.json). They open instantly with
+// no API call. A typed journey that names one of them ("follow Shaka") uses it too.
+let tourIndex = null;
+async function listTours() {
+  if (!tourIndex) tourIndex = await fetch(chrome.runtime.getURL('tours/index.json')).then((r) => r.json());
+  return tourIndex;
+}
+
+async function matchPreloaded(phrase) {
+  const p = ' ' + norm(phrase).replace(/[^a-z0-9' -]/g, ' ') + ' ';
+  let best = null, bestLen = 0;
+  for (const t of await listTours()) {
+    for (const k of t.keywords) {
+      if (k.length > bestLen && p.includes(' ' + k)) {
+        best = t.id;
+        bestLen = k.length;
+      }
+    }
+  }
+  return best;
+}
+
+async function loadPreloaded(id) {
+  if (!/^[a-z0-9-]+$/.test(id)) throw new Error('Unknown tour.');
+  const res = await fetch(chrome.runtime.getURL(`tours/${id}.json`));
+  if (!res.ok) throw new Error('That tour is missing from the extension.');
+  return res.json();
+}
+
+async function startTour(phrase, sender, tourId) {
   const tab = sender.tab || (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
   let tabId;
   if (tab && isEarth(tab.url)) tabId = tab.id;
   else tabId = (await chrome.tabs.create({ url: 'https://earth.google.com/web/' })).id;
 
-  runTour(phrase, tabId);
+  runTour(phrase, tabId, tourId);
   return { tabId, onEarth: !!(tab && isEarth(tab.url)) };
 }
 
-async function runTour(phrase, tabId) {
+async function runTour(phrase, tabId, tourId) {
   if (job) {
     job.aborted = true;
     job.ctrl.abort();
@@ -439,6 +469,19 @@ async function runTour(phrase, tabId) {
     snapTried: new Set(),
     active: { tabId, phrase, status: 'planning', started: Date.now(), index: -1, region: null, tour: { stops: [] } }
   });
+
+  const preloadedId = tourId || (await matchPreloaded(phrase).catch(() => null));
+  if (preloadedId) {
+    try {
+      j.active.tour = await loadPreloaded(preloadedId);
+      j.active.tourId = preloadedId;
+      j.active.status = 'ready';
+      await persist(true);
+      return;
+    } catch {
+      // fall through to a generated tour
+    }
+  }
 
   const cached = await cacheGet('tourCache', key);
   if (cached) {
@@ -548,7 +591,7 @@ async function endTour(sender) {
 async function retryTour(sender) {
   const { activeTour } = await chrome.storage.local.get('activeTour');
   if (!activeTour || !sender.tab || activeTour.tabId !== sender.tab.id) return false;
-  runTour(activeTour.phrase, sender.tab.id);
+  runTour(activeTour.phrase, sender.tab.id, activeTour.tourId);
   return true;
 }
 
@@ -643,7 +686,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     resolve: () => resolve(msg.phrase),
     jump: () => jump({ candidate: msg.candidate, target: msg.target, tabId: sender.tab?.id }),
     openOptions: () => chrome.runtime.openOptionsPage(),
-    startTour: () => startTour(msg.phrase, sender),
+    startTour: () => startTour(msg.phrase, sender, msg.tourId),
+    listTours: () => listTours(),
     getTour: () => getTour(sender),
     tourIndex: () => setTourIndex(msg.index, sender),
     endTour: () => endTour(sender),

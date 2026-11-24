@@ -1,0 +1,114 @@
+{
+ "id": "mapungubwe",
+ "title": "Mapungubwe",
+ "span": "c. 900 to 1450, the Limpopo valley",
+ "summary": "Mapungubwe was southern Africa's first known kingdom, a trading state whose rulers lived on a hilltop above the Limpopo. Its gold, ivory and glass beads connected it to the Indian Ocean world.",
+ "caveat": "Everything here comes from archaeology: there are no written records. Dates come from radiocarbon dating, and reasons for the rise and fall of these towns are interpretations.",
+ "keywords": [
+  "mapungubwe",
+  "golden rhino",
+  "limpopo kingdom"
+ ],
+ "stops": [
+  {
+   "date": "c. 900",
+   "title": "Schroda",
+   "place": "Limpopo valley, near Mapungubwe",
+   "lat": -22.25,
+   "lng": 29.2,
+   "range_m": 20000,
+   "narration": "The first big town in the valley grew rich trading ivory toward the coast. Clay figurines found here suggest initiation ceremonies.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows the national park; Schroda lies nearby.",
+   "sources": [
+    "Thomas Huffman, Mapungubwe: Ancient African Civilisation on the Limpopo (2005)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1000",
+   "title": "K2",
+   "place": "below Mapungubwe Hill",
+   "lat": -22.1925,
+   "lng": 29.23888889,
+   "range_m": 4000,
+   "narration": "The capital moved to a settlement now called K2, at the foot of the hill. Trade in glass beads and gold grew, and so did differences in wealth.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows the hill; K2 lies just beside it.",
+   "sources": [
+    "Thomas Huffman, Mapungubwe: Ancient African Civilisation on the Limpopo (2005)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1220",
+   "title": "Mapungubwe Hill",
+   "place": "Mapungubwe National Park, Limpopo",
+   "lat": -22.1925,
+   "lng": 29.23888889,
+   "range_m": 2500,
+   "narration": "The ruler and elite moved to the top of the hill, separating themselves from commoners below. Archaeologists see this as the beginning of a class-based kingdom.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Huffman, Mapungubwe: Ancient African Civilisation on the Limpopo (2005)",
+    "Innocent Pikirayi, The Zimbabwe Culture (2001)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1250",
+   "title": "Thulamela",
+   "place": "Kruger National Park, Limpopo",
+   "lat": -22.43333333,
+   "lng": 31.1975,
+   "range_m": 4000,
+   "narration": "A later stone-walled hilltop town to the east shows the Mapungubwe tradition spreading. Gold and trade goods were found in its royal graves.",
+   "confidence": "approximate",
+   "confidence_note": "Thulamela was occupied for centuries; this date is its earliest phase.",
+   "sources": [
+    "Innocent Pikirayi, The Zimbabwe Culture (2001)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1300",
+   "title": "Great Zimbabwe",
+   "place": "near present-day Masvingo, Zimbabwe",
+   "lat": -20.26666667,
+   "lng": 30.93333333,
+   "range_m": 4000,
+   "narration": "As Mapungubwe was abandoned, power shifted north to Great Zimbabwe, whose builders raised the largest ancient stone structures in Africa south of the Sahara.",
+   "confidence": "approximate",
+   "confidence_note": "Why Mapungubwe declined, perhaps a drier climate or shifting trade routes, is debated.",
+   "sources": [
+    "Innocent Pikirayi, The Zimbabwe Culture (2001)",
+    "Thomas Huffman, Mapungubwe: Ancient African Civilisation on the Limpopo (2005)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1933",
+   "title": "The golden rhinoceros",
+   "place": "University of Pretoria",
+   "lat": -25.75361111,
+   "lng": 28.22972222,
+   "range_m": 1500,
+   "narration": "Royal graves on the hilltop were excavated, revealing a small rhinoceros of gold foil over a wooden core. It is kept, with the rest of the Mapungubwe Collection, at the University of Pretoria.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Huffman, Mapungubwe: Ancient African Civilisation on the Limpopo (2005)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

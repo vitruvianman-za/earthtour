@@ -154,13 +154,29 @@
   }
 
   // "c. 1787" -> 1787, "334 BCE" -> -334, "June 1824" -> 1824; null if no year
+  // A sortable year from a date as written: "c. 1787", "June 1824", "334 BCE",
+  // "c. 3.67 million years ago", "c. 164,000 years ago". Null if there's no number.
   function yearOf(date) {
-    const m = String(date || '').match(/(\d{1,4})\s*(BCE|BC)?/i);
+    const d = String(date || '');
+    let m = d.match(/([\d.]+)\s*million years ago/i);
+    if (m) return -Number(m[1]) * 1e6;
+    m = d.match(/([\d][\d,]*)\s*years ago/i);
+    if (m) return -Number(m[1].replace(/,/g, ''));
+    // Prefer a 3-4 digit year, so "18 July 1918" is 1918, not 18.
+    m = d.match(/\b(\d{3,4})(?:s\b|\b)\s*(BCE|BC)?/i) || d.match(/\b(\d{1,2})\s*(BCE|BC)\b/i);
     if (!m) return null;
     return m[2] ? -Number(m[1]) : Number(m[1]);
   }
   function yearLabel(y) {
+    if (y <= -1e6) return `${+(-y / 1e6).toFixed(1)}m years ago`;
+    if (y <= -10000) return `${Math.round(-y / 1000).toLocaleString('en')},000 years ago`;
     return y < 0 ? `${-y} BCE` : String(y);
+  }
+  // What kind of tour this is, said plainly wherever it matters.
+  function provenance(tour) {
+    return tour && tour.curated
+      ? 'Researched tour, written from the sources listed for each stop. Not yet reviewed by a historian.'
+      : 'AI-generated tour. Check the sources before relying on it.';
   }
 
   // Positions (0..100) on the time scale, with a minimum gap so close years stay clickable.
@@ -199,7 +215,7 @@
     return `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
 <name>${xml(tour.title || 'Tour')}</name>
-<description>${xml(`${tour.span || ''}\n\n${tour.summary || ''}\n\n${tour.caveat || ''}\n\nAI-generated tour. Check the sources before relying on it.`)}</description>
+<description>${xml(`${tour.span || ''}\n\n${tour.summary || ''}\n\n${tour.caveat || ''}\n\n${provenance(tour)}`)}</description>
 <Style id="route"><LineStyle><color>ff4ac9ff</color><width>4</width></LineStyle></Style>
 <Placemark><name>Route</name><styleUrl>#route</styleUrl><LineString><tessellate>1</tessellate><coordinates>${line}</coordinates></LineString></Placemark>
 ${marks}
@@ -435,6 +451,7 @@ ${marks}
       tl.textContent = '';
       const meta = el('div', 'meta');
       meta.append(el('b', null, `${stops().length} stops`));
+      if (t.curated) meta.append(el('span', null, 'Researched'));
       tl.append(meta);
       renderScale(null);
       const go = el('button', 'go', 'Start tour');
@@ -498,7 +515,7 @@ ${marks}
       more.append(lg);
       const foot = el('div');
       foot.style.marginTop = '10px';
-      foot.append(el('span', null, 'AI-generated tour. Check the sources before relying on it. '));
+      foot.append(el('span', null, provenance(t) + ' '));
       if (!planning()) {
         const k = el('button', 'lnk', 'Download KML');
         k.title = 'Import into a Google Earth project to see the route as a line';

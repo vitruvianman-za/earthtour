@@ -1,0 +1,249 @@
+{
+ "id": "mandela",
+ "title": "Mandela's long walk",
+ "span": "1918 to 2013, South Africa",
+ "summary": "Nelson Mandela's life traced from a rural Eastern Cape village to the presidency, through 27 years in prison. It follows the arc of the struggle against apartheid itself.",
+ "caveat": "This is one of the best-documented lives in South African history: Mandela's own autobiography, an authorised biography, court records and press coverage agree on nearly every place and date here.",
+ "keywords": [
+  "mandela",
+  "madiba",
+  "long walk"
+ ],
+ "stops": [
+  {
+   "date": "18 July 1918",
+   "title": "Born in Mvezo",
+   "place": "Mvezo, Eastern Cape",
+   "lat": -31.95,
+   "lng": 28.516,
+   "range_m": 6000,
+   "narration": "Rolihlahla Mandela was born in this village on the Mbashe River, into a branch of the Thembu royal family. His father lost his position as headman when Mandela was an infant, and the family moved.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1920s",
+   "title": "Childhood in Qunu",
+   "place": "Qunu, Eastern Cape",
+   "lat": -31.78333333,
+   "lng": 28.61666667,
+   "range_m": 6000,
+   "narration": "Mandela grew up herding cattle in Qunu and was given the name Nelson by a teacher at the local mission school. After his father died, he went to live under the guardianship of the Thembu regent, Jongintaba.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1939",
+   "title": "University of Fort Hare",
+   "place": "Alice, Eastern Cape",
+   "lat": -32.7875,
+   "lng": 26.8475,
+   "range_m": 3000,
+   "narration": "Fort Hare was one of the few universities open to Black South Africans, and Mandela met Oliver Tambo here. He left in 1940 after joining a student protest and refusing to back down.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1941",
+   "title": "Arrives in Johannesburg",
+   "place": "Alexandra, Johannesburg",
+   "lat": -26.10383333,
+   "lng": 28.09616667,
+   "range_m": 5000,
+   "narration": "Fleeing an arranged marriage, Mandela came to Johannesburg and lived in Alexandra township while working and studying law. Walter Sisulu helped him find work and drew him into the African National Congress.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1946",
+   "title": "8115 Vilakazi Street",
+   "place": "Orlando West, Soweto",
+   "lat": -26.23853611,
+   "lng": 27.90877222,
+   "range_m": 1500,
+   "narration": "Mandela moved into this small house in Orlando West, his home until his arrest. In 1952 he helped lead the Defiance Campaign and opened South Africa's first Black law firm with Tambo.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "5 August 1962",
+   "title": "Arrested near Howick",
+   "place": "outside Howick, KwaZulu-Natal",
+   "lat": -29.46666667,
+   "lng": 30.23333333,
+   "range_m": 6000,
+   "narration": "After 17 months underground, Mandela was stopped at a police roadblock while disguised as a chauffeur. A sculpture of 50 steel columns now marks the capture site beside the road.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows Howick; the capture site is just outside the town.",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "11 July 1963",
+   "title": "Liliesleaf Farm raid",
+   "place": "Rivonia, Johannesburg",
+   "lat": -26.04388889,
+   "lng": 28.05361111,
+   "range_m": 2500,
+   "narration": "Police raided this farm, the secret headquarters of the ANC's armed wing, and seized documents that put Mandela, already in prison, on trial with the movement's leadership.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "20 April 1964",
+   "title": "The Rivonia Trial",
+   "place": "Palace of Justice, Pretoria",
+   "lat": -25.7475,
+   "lng": 28.1878,
+   "range_m": 1500,
+   "narration": "From the dock, Mandela said democracy and freedom were \"an ideal for which I am prepared to die\". He and seven others were sentenced to life imprisonment in June.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1964 to 1982",
+   "title": "Robben Island",
+   "place": "Robben Island, Table Bay",
+   "lat": -33.805,
+   "lng": 18.37,
+   "range_m": 6000,
+   "narration": "Prisoner 466/64 spent 18 years here, breaking rocks in a lime quarry that damaged his eyes. The island became known as \"the university\": prisoners taught each other in secret.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1982 to 1988",
+   "title": "Pollsmoor Prison",
+   "place": "Tokai, Cape Town",
+   "lat": -34.06861111,
+   "lng": 18.43222222,
+   "range_m": 2500,
+   "narration": "Mandela was moved to the mainland with other senior leaders. From here, in 1985, he began secret talks with the government without telling his comrades.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1988 to 1990",
+   "title": "Victor Verster Prison",
+   "place": "near Paarl, Western Cape",
+   "lat": -33.84361111,
+   "lng": 19.01611111,
+   "range_m": 3000,
+   "narration": "His last years in prison were spent in a warder's cottage here, where talks with the government continued. He walked out of its gates on 11 February 1990.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "11 February 1990",
+   "title": "Speech from City Hall",
+   "place": "Cape Town City Hall",
+   "lat": -33.92527778,
+   "lng": 18.42388889,
+   "range_m": 1200,
+   "narration": "Hours after his release, Mandela spoke from the balcony of City Hall to a crowd on the Grand Parade. He had been in prison for 27 years.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "10 May 1994",
+   "title": "Inauguration",
+   "place": "Union Buildings, Pretoria",
+   "lat": -25.74046667,
+   "lng": 28.21202222,
+   "range_m": 1500,
+   "narration": "After the first election open to all South Africans, Mandela was sworn in as president at the Union Buildings, the seat of the government that had imprisoned him.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Nelson Mandela, Long Walk to Freedom (1994)",
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "15 December 2013",
+   "title": "Laid to rest in Qunu",
+   "place": "Qunu, Eastern Cape",
+   "lat": -31.78333333,
+   "lng": 28.61666667,
+   "range_m": 6000,
+   "narration": "Mandela died on 5 December 2013, aged 95, and was buried in the village where he grew up.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Anthony Sampson, Mandela: The Authorised Biography (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

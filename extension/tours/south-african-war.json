@@ -1,0 +1,168 @@
+{
+ "id": "south-african-war",
+ "title": "The South African War",
+ "span": "1899 to 1902, South Africa",
+ "summary": "Britain fought the two Boer republics for control of the Transvaal and its gold. The war began with sieges and set-piece battles and ended with farm burning and concentration camps.",
+ "caveat": "The British and Boer sides are well documented. The Black experience, as soldiers, scouts, labourers and camp inmates, was long left out and is still being recovered; camp death tolls for Black people are estimates.",
+ "keywords": [
+  "boer war",
+  "anglo-boer",
+  "south african war",
+  "mafeking",
+  "spion kop",
+  "spioenkop"
+ ],
+ "stops": [
+  {
+   "date": "13 October 1899",
+   "title": "Siege of Mafeking",
+   "place": "Mafikeng, North West",
+   "lat": -25.86555556,
+   "lng": 25.64361111,
+   "range_m": 6000,
+   "narration": "Two days after war was declared, Boer forces surrounded this railway town. Robert Baden-Powell's garrison held out for 217 days, with Black residents doing much of the fighting and suffering most of the hunger.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)",
+    "Bill Nasson, The South African War, 1899-1902 (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "14 October 1899",
+   "title": "Siege of Kimberley",
+   "place": "Kimberley, Northern Cape",
+   "lat": -28.73833333,
+   "lng": 24.76388889,
+   "range_m": 6000,
+   "narration": "The diamond town, with Cecil Rhodes inside, was besieged for four months.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "2 November 1899",
+   "title": "Siege of Ladysmith",
+   "place": "Ladysmith, KwaZulu-Natal",
+   "lat": -28.5592,
+   "lng": 29.7808,
+   "range_m": 7000,
+   "narration": "A British army was trapped here for 118 days. Relieving it took months of costly fighting.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "11 December 1899",
+   "title": "Magersfontein",
+   "place": "Magersfontein, Northern Cape",
+   "lat": -28.96944444,
+   "lng": 24.69833333,
+   "range_m": 6000,
+   "narration": "Boers dug trenches at the foot of the hills instead of on top, and the Highland Brigade walked into their fire at dawn. It was one of three British defeats in \"Black Week\".",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)",
+    "Bill Nasson, The South African War, 1899-1902 (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "24 January 1900",
+   "title": "Spion Kop",
+   "place": "Spioenkop, KwaZulu-Natal",
+   "lat": -28.65,
+   "lng": 29.51638889,
+   "range_m": 5000,
+   "narration": "British troops took the summit at night and found at dawn that they were exposed to fire from three sides. Hundreds died in shallow trenches before both sides withdrew.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "27 February 1900",
+   "title": "Paardeberg",
+   "place": "Paardeberg, Free State",
+   "lat": -28.99083333,
+   "lng": 25.07527778,
+   "range_m": 7000,
+   "narration": "General Cronje's army was surrounded on the Modder River and surrendered after a ten-day siege, the turning point of the conventional war.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)",
+    "Bill Nasson, The South African War, 1899-1902 (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "5 June 1900",
+   "title": "Pretoria taken",
+   "place": "Church Square, Pretoria",
+   "lat": -25.7465,
+   "lng": 28.1882,
+   "range_m": 2000,
+   "narration": "British forces entered the Transvaal capital. The war was expected to end; instead the Boers turned to guerrilla warfare for two more years.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1900 to 1902",
+   "title": "The camps",
+   "place": "Bloemfontein, Free State",
+   "lat": -29.1416,
+   "lng": 26.2083,
+   "range_m": 4000,
+   "narration": "To defeat the guerrillas, Britain burned farms and moved civilians into camps. About 28,000 Boer civilians died, most of them children, along with at least 14,000 Black people in separate camps. The National Women's Monument stands here.",
+   "confidence": "disputed",
+   "confidence_note": "The Boer death toll is well established; the number of Black deaths is an estimate and probably too low.",
+   "sources": [
+    "Elizabeth van Heyningen, The Concentration Camps of the Anglo-Boer War (2013)",
+    "Stowell Kessler, The Black Concentration Camps of the Anglo-Boer War, 1899-1902 (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "31 May 1902",
+   "title": "Peace signed",
+   "place": "Melrose House, Pretoria",
+   "lat": -25.7555,
+   "lng": 28.1925,
+   "range_m": 1500,
+   "narration": "After talks at Vereeniging, the Treaty of Vereeniging was signed in this house. The republics became British colonies, and the question of Black political rights was postponed.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Thomas Pakenham, The Boer War (1979)",
+    "Bill Nasson, The South African War, 1899-1902 (1999)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

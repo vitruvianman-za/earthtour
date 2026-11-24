@@ -1,0 +1,117 @@
+{
+ "id": "june-16",
+ "title": "June 16, 1976",
+ "span": "June to August 1976, Soweto and beyond",
+ "summary": "Students marched against being taught in Afrikaans and were met with police gunfire. The uprising spread across the country and brought a new generation into the struggle.",
+ "caveat": "Well documented in photographs, press reports and later testimony, including to the Truth and Reconciliation Commission. The number of people killed is disputed.",
+ "keywords": [
+  "june 16",
+  "soweto uprising",
+  "soweto 1976",
+  "hector pieterson"
+ ],
+ "stops": [
+  {
+   "date": "16 June 1976, morning",
+   "title": "Naledi High School",
+   "place": "Naledi, Soweto",
+   "lat": -26.25048,
+   "lng": 27.831368,
+   "range_m": 1500,
+   "narration": "Students here had already been organising against a 1974 order that half of all subjects be taught in Afrikaans. On the morning of the 16th, they set out to join students from other schools.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Sifiso Mxolisi Ndlovu, The Soweto Uprisings: Counter-memories of June 1976 (1998)",
+    "Alan Brooks and Jeremy Brickhill, Whirlwind Before the Storm (1980)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "16 June 1976, morning",
+   "title": "Morris Isaacson High School",
+   "place": "Jabavu, Soweto",
+   "lat": -26.2455,
+   "lng": 27.8722,
+   "range_m": 1500,
+   "narration": "Student leader Tsietsi Mashinini addressed pupils here before the march. Columns from different schools converged and headed for Orlando Stadium.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Sifiso Mxolisi Ndlovu, The Soweto Uprisings: Counter-memories of June 1976 (1998)",
+    "Alan Brooks and Jeremy Brickhill, Whirlwind Before the Storm (1980)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "16 June 1976",
+   "title": "Orlando West",
+   "place": "Orlando West, Soweto",
+   "lat": -26.23483333,
+   "lng": 27.90861667,
+   "range_m": 1200,
+   "narration": "Near Orlando West High School, police opened fire on the marchers. Sam Nzima photographed 12-year-old Hector Pieterson being carried by Mbuyisa Makhubo; the image went around the world. The Hector Pieterson Museum stands here.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Sifiso Mxolisi Ndlovu, The Soweto Uprisings: Counter-memories of June 1976 (1998)",
+    "Helena Pohlandt-McCormick, \"I Saw a Nightmare...\": Doing Violence to Memory (2005)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "16 June 1976",
+   "title": "Orlando Stadium",
+   "place": "Orlando, Soweto",
+   "lat": -26.23189444,
+   "lng": 27.92289167,
+   "range_m": 1500,
+   "narration": "The stadium was the planned destination of the march. Students never reached it as the day turned into running battles with police across Soweto.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Alan Brooks and Jeremy Brickhill, Whirlwind Before the Storm (1980)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "17 to 18 June 1976",
+   "title": "Alexandra",
+   "place": "Alexandra, Johannesburg",
+   "lat": -26.10383333,
+   "lng": 28.09616667,
+   "range_m": 4000,
+   "narration": "Within days, the protests spread to other townships around Johannesburg, including Alexandra, and then to the rest of the country.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Alan Brooks and Jeremy Brickhill, Whirlwind Before the Storm (1980)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "August 1976",
+   "title": "Langa",
+   "place": "Langa, Cape Town",
+   "lat": -33.94527778,
+   "lng": 18.53,
+   "range_m": 4000,
+   "narration": "Students in Cape Town's townships rose up in August, and protests continued into 1977. The official death toll was 176; other estimates run to several hundred.",
+   "confidence": "disputed",
+   "confidence_note": "The death toll is disputed: official figures were lower than independent estimates.",
+   "sources": [
+    "Alan Brooks and Jeremy Brickhill, Whirlwind Before the Storm (1980)",
+    "Truth and Reconciliation Commission of South Africa Report (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

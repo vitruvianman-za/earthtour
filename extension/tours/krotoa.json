@@ -1,0 +1,131 @@
+{
+ "id": "krotoa",
+ "title": "Krotoa and the early Cape",
+ "span": "1652 to 1674, Table Bay",
+ "summary": "Krotoa, a young Khoi woman, became the chief interpreter between the Dutch settlement at the Cape and the Khoikhoi. Her life traces the first two decades of colonial South Africa.",
+ "caveat": "She is known almost entirely through the official journal of the Dutch settlement, written by men who saw her as useful and later as a disgrace. Her own voice survives only as they reported it.",
+ "keywords": [
+  "krotoa",
+  "early cape"
+ ],
+ "stops": [
+  {
+   "date": "1652",
+   "title": "The Dutch fort",
+   "place": "Table Bay, present-day Cape Town",
+   "lat": -33.9259,
+   "lng": 18.4278,
+   "range_m": 2500,
+   "narration": "The Dutch East India Company built a fort here to supply its ships. Krotoa, about ten years old and a niece of the Khoi leader Autshumao, was taken into the household of the commander, Jan van Riebeeck.",
+   "confidence": "approximate",
+   "confidence_note": "Her age is an estimate; the original fort stood near the later Castle.",
+   "sources": [
+    "The Journal of Jan van Riebeeck (Van Riebeeck Society, 1952-58)",
+    "Julia C. Wells, \"Eva's Men: Gender and Power in the Establishment of the Cape of Good Hope, 1652-74\", Journal of African History (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1657 to 1660",
+   "title": "Among the Cochoqua",
+   "place": "near Saldanha Bay, Western Cape",
+   "lat": -33.03472222,
+   "lng": 18.00972222,
+   "range_m": 25000,
+   "narration": "Krotoa's sister was married to the Cochoqua leader Oedasoa, and Krotoa carried messages and negotiated cattle trade between his people and the Dutch.",
+   "confidence": "approximate",
+   "confidence_note": "The Cochoqua moved with their herds; the marker shows the general area.",
+   "sources": [
+    "Julia C. Wells, \"Eva's Men: Gender and Power in the Establishment of the Cape of Good Hope, 1652-74\", Journal of African History (1998)",
+    "Richard Elphick, Khoikhoi and the Founding of White South Africa (1985)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1659",
+   "title": "War on the Liesbeek",
+   "place": "Liesbeek River, Cape Town",
+   "lat": -33.93638889,
+   "lng": 18.47638889,
+   "range_m": 4000,
+   "narration": "Khoikhoi fought the first war against the settlers as Dutch farms spread along the river onto their grazing land. Krotoa interpreted the peace talks.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Richard Elphick, Khoikhoi and the Founding of White South Africa (1985)",
+    "The Journal of Jan van Riebeeck (Van Riebeeck Society, 1952-58)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1660",
+   "title": "Van Riebeeck's hedge",
+   "place": "Kirstenbosch, Cape Town",
+   "lat": -33.9875,
+   "lng": 18.4325,
+   "range_m": 2000,
+   "narration": "A hedge of wild almond was planted to mark the colony's boundary and keep the Khoikhoi out. A stretch of it still grows in Kirstenbosch.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Richard Elphick, Khoikhoi and the Founding of White South Africa (1985)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1664",
+   "title": "Married at the fort",
+   "place": "Table Bay, present-day Cape Town",
+   "lat": -33.9259,
+   "lng": 18.4278,
+   "range_m": 2500,
+   "narration": "Baptised as Eva in 1662, Krotoa married the Danish surgeon Pieter van Meerhof, the first recorded marriage between a Khoi woman and a European at the Cape.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "The Journal of Jan van Riebeeck (Van Riebeeck Society, 1952-58)",
+    "Julia C. Wells, \"Eva's Men: Gender and Power in the Establishment of the Cape of Good Hope, 1652-74\", Journal of African History (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1665 to 1669",
+   "title": "Robben Island",
+   "place": "Robben Island, Table Bay",
+   "lat": -33.805,
+   "lng": 18.37,
+   "range_m": 6000,
+   "narration": "She moved to the island when van Meerhof became its superintendent. After he was killed on an expedition to Madagascar, she struggled, and in 1669 she was banished back to the island, away from her children.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Julia C. Wells, \"Eva's Men: Gender and Power in the Establishment of the Cape of Good Hope, 1652-74\", Journal of African History (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1674",
+   "title": "Buried in the Castle",
+   "place": "Castle of Good Hope, Cape Town",
+   "lat": -33.9259,
+   "lng": 18.4278,
+   "range_m": 1500,
+   "narration": "Krotoa died at about 32 and was buried inside the newly built Castle. Today many South Africans claim descent from her, and she has become a symbol of a mixed and painful origin.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Julia C. Wells, \"Eva's Men: Gender and Power in the Establishment of the Cape of Good Hope, 1652-74\", Journal of African History (1998)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

@@ -38,6 +38,9 @@
 .ej-list.ej-stale{opacity:.4}
 .ej-item{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:0;cursor:pointer}
 .ej-item.ej-sel{background:rgba(255,201,74,.14)}
+.ej-item.ej-tourrow{flex-direction:row;align-items:center;gap:12px}
+.ej-tourrow .ej-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ej-tourrow .ej-chip{flex:none;font-size:11px;font-weight:600;padding:2px 7px;border:1px solid rgba(255,201,74,.6);color:#FFC94A}
 .ej-name{font-weight:500;color:#E8EDF5}
 .ej-note{font-size:12.5px;color:#9AAAC4}
 .ej-skel{display:block;height:48px;margin:4px 0;border-radius:0;background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 100%);background-size:200% 100%;animation:ej-shimmer 1.2s linear infinite}
@@ -131,6 +134,8 @@
     let resolvedFor = null; // the phrase the current list belongs to
     let isOpen = mode === 'popup';
     let reqId = 0;
+    let preloaded = null;   // researched tours shipped with the extension
+    let showingTours = false;
 
     // ---------- rendering ----------
     function renderTarget() {
@@ -173,6 +178,7 @@
 
     function highlight() {
       [...list.children].forEach((li, i) => li.classList.toggle('ej-sel', i === selected));
+      if (selected < 0) return;
       const cur = list.children[selected];
       if (cur) cur.scrollIntoView({ block: 'nearest' });
     }
@@ -182,8 +188,16 @@
       list.classList.remove('ej-stale');
       candidates.forEach((c, i) => {
         const li = el('li', 'ej-item');
-        li.append(el('div', 'ej-name', c.name));
-        if (c.note) li.append(el('div', 'ej-note', c.note));
+        if (c.tourId) {
+          li.classList.add('ej-tourrow');
+          const txt = el('div', 'ej-txt');
+          txt.append(el('div', 'ej-name', c.name));
+          if (c.note) txt.append(el('div', 'ej-note', c.note));
+          li.append(txt, el('span', 'ej-chip', 'Tour'));
+        } else {
+          li.append(el('div', 'ej-name', c.name));
+          if (c.note) li.append(el('div', 'ej-note', c.note));
+        }
         li.addEventListener('mouseenter', () => {
           selected = i;
           highlight();
@@ -198,6 +212,42 @@
       highlight();
     }
 
+    // ---------- preloaded tours ----------
+    async function loadPreloaded() {
+      if (preloaded) return preloaded;
+      const res = await send({ type: 'listTours' });
+      preloaded = res && res.ok ? res.data : [];
+      return preloaded;
+    }
+
+    // Shows preloaded tours: all of them when the box is empty, matching ones as you type.
+    // Nothing is selected until you arrow into the list, so Enter still searches what you typed.
+    async function showPreloaded() {
+      const text = input.value.trim().toLowerCase();
+      const all = await loadPreloaded();
+      if (input.value.trim().toLowerCase() !== text) return; // typed on while loading
+      const hits = !text
+        ? all
+        : text.length < 3
+          ? []
+          : all.filter((t) => [t.title, t.span, ...t.keywords].some((x) => x.toLowerCase().includes(text)));
+      if (!hits.length) {
+        if (showingTours) {
+          list.textContent = '';
+          candidates = [];
+          showingTours = false;
+          setStatus('');
+        }
+        return;
+      }
+      candidates = hits.map((t) => ({ name: t.title, note: `${t.span}, ${t.stops} stops`, tourId: t.id }));
+      selected = -1;
+      resolvedFor = null;
+      showingTours = true;
+      renderList();
+      setStatus(text ? 'Researched tours' : 'Researched tours, or type a place or a journey');
+    }
+
     // ---------- tours ----------
     // Journeys, campaigns and voyages become a stop-by-stop tour in Earth.
     const TOUR_RE =
@@ -208,14 +258,14 @@
       root.classList.toggle('ej-tour', isTour(input.value));
     }
 
-    async function startTour(phrase) {
+    async function startTour(phrase, tourId) {
       const id = ++reqId;
       candidates = [];
       resolvedFor = null;
       list.textContent = '';
       setStatus('Opening the tour in Google Earth\u2026', 'busy');
 
-      const res = await send({ type: 'startTour', phrase });
+      const res = await send({ type: 'startTour', phrase, tourId });
       if (id !== reqId) return;
       if (!res.ok) return showError(res);
 
@@ -229,6 +279,7 @@
       const phrase = input.value.trim();
       if (!phrase) return;
       if (isTour(phrase)) return startTour(phrase);
+      showingTours = false;
       const id = ++reqId;
 
       candidates = [];
@@ -240,7 +291,7 @@
       if (id !== reqId) return; // a newer search superseded this one
       if (!res.ok) return showError(res);
 
-      candidates = res.data.candidates;
+      candidates = res.data.candidates || [];
       selected = 0;
       resolvedFor = phrase;
 
@@ -252,6 +303,7 @@
     async function go() {
       const c = candidates[selected];
       if (!c) return;
+      if (c.tourId) return startTour(c.name, c.tourId);
       const id = ++reqId;
       setStatus(`Flying to ${c.name}\u2026`, 'busy');
       const res = await send({ type: 'jump', candidate: c, target });
@@ -266,7 +318,8 @@
       switch (e.key) {
         case 'Enter':
           e.preventDefault();
-          if (resolvedFor !== null && input.value.trim() === resolvedFor && candidates.length) go();
+          if (showingTours && selected >= 0) go();
+          else if (resolvedFor !== null && input.value.trim() === resolvedFor && candidates.length) go();
           else search();
           break;
         case 'ArrowDown':
@@ -279,7 +332,7 @@
         case 'ArrowUp':
           if (candidates.length) {
             e.preventDefault();
-            selected = (selected - 1 + candidates.length) % candidates.length;
+            selected = selected <= 0 ? candidates.length - 1 : selected - 1;
             highlight();
           }
           break;
@@ -298,6 +351,7 @@
       const stale = resolvedFor !== null && input.value.trim() !== resolvedFor;
       list.classList.toggle('ej-stale', stale);
       updateMode();
+      if (resolvedFor === null || stale) showPreloaded();
     });
 
     targetBtn.addEventListener('mousedown', (e) => e.preventDefault());
@@ -306,6 +360,7 @@
     function open() {
       isOpen = true;
       root.classList.add('ej-open');
+      if (!input.value.trim()) showPreloaded();
       requestAnimationFrame(() => {
         input.focus();
         input.select();
@@ -327,6 +382,7 @@
       root.classList.add('ej-open');
       input.addEventListener('keydown', handleKey);
       setTimeout(() => input.focus(), 0);
+      showPreloaded();
     }
     renderTarget();
 

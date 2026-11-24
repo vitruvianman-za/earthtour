@@ -1,0 +1,115 @@
+{
+ "id": "dias",
+ "title": "Dias round the Cape",
+ "span": "1487 to 1488, Lisbon to the Eastern Cape",
+ "summary": "Bartolomeu Dias led the first European ships known to sail round the southern tip of Africa, opening a sea route to the Indian Ocean.",
+ "caveat": "Dias's own report is lost; the voyage is known mainly from later Portuguese chronicles and from stone crosses he raised, one of which was found in pieces in 1938. Khoikhoi people had lived on these shores for centuries.",
+ "keywords": [
+  "bartolomeu",
+  "dias round",
+  "dias voyage"
+ ],
+ "stops": [
+  {
+   "date": "August 1487",
+   "title": "Leaves Lisbon",
+   "place": "Lisbon, Portugal",
+   "lat": 38.72527778,
+   "lng": -9.15,
+   "range_m": 20000,
+   "narration": "Dias sailed with two caravels and a supply ship, ordered to find the end of Africa and a sea route east.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Eric Axelson, Portuguese in South-East Africa, 1488-1600 (1973)",
+    "Joao de Barros, Decadas da Asia (1552)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "December 1487",
+   "title": "Angra Pequena",
+   "place": "Luderitz, Namibia",
+   "lat": -26.64583333,
+   "lng": 15.15388889,
+   "range_m": 15000,
+   "narration": "The fleet anchored in this bay on the desert coast. On the way home, Dias is said to have raised a stone cross on the nearby headland now called Dias Point.",
+   "confidence": "approximate",
+   "confidence_note": "Chronicle dates differ; the cross site is shown approximately.",
+   "sources": [
+    "Eric Axelson, Portuguese in South-East Africa, 1488-1600 (1973)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "3 February 1488",
+   "title": "Mossel Bay",
+   "place": "Mossel Bay, Western Cape",
+   "lat": -34.18333333,
+   "lng": 22.13333333,
+   "range_m": 8000,
+   "narration": "After a storm blew the ships far south, Dias turned north and reached land here, past the Cape without seeing it. Khoikhoi herders drove the strangers off and one was killed by a Portuguese crossbow.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Eric Axelson, Portuguese in South-East Africa, 1488-1600 (1973)",
+    "Joao de Barros, Decadas da Asia (1552)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "March 1488",
+   "title": "The cross at Kwaaihoek",
+   "place": "Kwaaihoek, Eastern Cape",
+   "lat": -33.718499,
+   "lng": 26.624014,
+   "range_m": 3000,
+   "narration": "Dias raised a stone cross, a padrao, on this headland. Its fragments were found and pieced together in 1938, and a replica stands here.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Eric Axelson, Portuguese in South-East Africa, 1488-1600 (1973)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "March 1488",
+   "title": "Turning back",
+   "place": "Great Fish River mouth, Eastern Cape",
+   "lat": -33.49277778,
+   "lng": 27.13111111,
+   "range_m": 15000,
+   "narration": "With the coast clearly turning north-east toward India, the exhausted crew forced Dias to turn back near this river.",
+   "confidence": "approximate",
+   "confidence_note": "The exact turning point is uncertain.",
+   "sources": [
+    "Eric Axelson, Portuguese in South-East Africa, 1488-1600 (1973)",
+    "Joao de Barros, Decadas da Asia (1552)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "May 1488",
+   "title": "Cape of Good Hope",
+   "place": "Cape of Good Hope, Western Cape",
+   "lat": -34.35805556,
+   "lng": 18.47555556,
+   "range_m": 6000,
+   "narration": "On the way home Dias finally saw the cape. By tradition he named it the Cape of Storms, and King John II renamed it the Cape of Good Hope.",
+   "confidence": "disputed",
+   "confidence_note": "The naming story comes from later chroniclers and may be legend.",
+   "sources": [
+    "Joao de Barros, Decadas da Asia (1552)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

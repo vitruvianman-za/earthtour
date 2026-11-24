@@ -1,0 +1,146 @@
+{
+ "id": "human-origins",
+ "title": "Human origins",
+ "span": "about 3.7 million to 44,000 years ago, South Africa",
+ "summary": "Some of the most important evidence for human evolution comes from South African caves, from early hominins to the first signs of symbolic thought.",
+ "caveat": "Dates here come from scientific dating methods with error ranges, and several are still argued over. Stops are in order of age, not of discovery.",
+ "keywords": [
+  "human origins",
+  "cradle of humankind",
+  "sterkfontein",
+  "taung",
+  "blombos"
+ ],
+ "stops": [
+  {
+   "date": "c. 3.67 million years ago",
+   "title": "Little Foot",
+   "place": "Sterkfontein Caves, Gauteng",
+   "lat": -26.0157,
+   "lng": 27.7346,
+   "range_m": 2500,
+   "narration": "An almost complete Australopithecus skeleton, nicknamed Little Foot, took about 20 years to excavate from the cave rock. The same caves gave up the skull known as Mrs Ples in 1947.",
+   "confidence": "disputed",
+   "confidence_note": "Its age is disputed: one dating method gives 3.67 million years, others suggest closer to 2.6 million.",
+   "sources": [
+    "Granger et al., Nature (2015)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 2.8 million years ago",
+   "title": "The Taung Child",
+   "place": "near Taung, North West",
+   "lat": -27.5625,
+   "lng": 24.74805556,
+   "range_m": 12000,
+   "narration": "A child's skull found at a limestone quarry here in 1924 was named Australopithecus africanus by Raymond Dart. Most scientists doubted him for decades; he was right that Africa was central to human origins.",
+   "confidence": "approximate",
+   "confidence_note": "The age is approximate; the marker shows Taung, near the quarry.",
+   "sources": [
+    "Raymond Dart, Nature (1925)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1 million years ago",
+   "title": "Wonderwerk Cave",
+   "place": "near Kuruman, Northern Cape",
+   "lat": -27.845,
+   "lng": 23.55388889,
+   "range_m": 3000,
+   "narration": "Burnt bone and plant ash deep inside this cave are among the earliest evidence of controlled fire anywhere.",
+   "confidence": "approximate",
+   "confidence_note": "The age and how deliberate the fire was are still studied.",
+   "sources": [
+    "Berna et al., PNAS (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 300,000 years ago",
+   "title": "Homo naledi",
+   "place": "Rising Star cave, Cradle of Humankind",
+   "lat": -25.934,
+   "lng": 27.783,
+   "range_m": 4000,
+   "narration": "Cavers found more than 1,500 bones of a small-brained human relative deep in a hard-to-reach chamber. Why so many bodies ended up there is hotly debated.",
+   "confidence": "disputed",
+   "confidence_note": "Its age range is well dated; claims that it buried its dead are disputed. The marker is placed approximately.",
+   "sources": [
+    "Dirks et al., eLife (2017)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 164,000 years ago",
+   "title": "Pinnacle Point",
+   "place": "Pinnacle Point, Mossel Bay",
+   "lat": -34.20777778,
+   "lng": 22.08944444,
+   "range_m": 3000,
+   "narration": "People sheltering in these sea caves ate shellfish and ground red ochre, among the earliest such evidence in the world.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Marean et al., Nature (2007)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 110,000 years ago",
+   "title": "Klasies River Caves",
+   "place": "Klasies River, Eastern Cape",
+   "lat": -34.10810278,
+   "lng": 24.39013889,
+   "range_m": 3000,
+   "narration": "Remains here are among the oldest known of anatomically modern humans in southern Africa.",
+   "confidence": "approximate",
+   "confidence_note": "Dates vary between layers of the site.",
+   "sources": [
+    "Singer and Wymer, The Middle Stone Age at Klasies River Mouth in South Africa (1982)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 75,000 years ago",
+   "title": "Blombos Cave",
+   "place": "near Still Bay, Western Cape",
+   "lat": -34.41444444,
+   "lng": 21.2225,
+   "range_m": 3000,
+   "narration": "Pieces of ochre engraved with crosshatched lines, along with shell beads, are among the earliest known signs of symbolic thinking.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Henshilwood et al., Science (2002)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 44,000 years ago",
+   "title": "Border Cave",
+   "place": "Lebombo Mountains, KwaZulu-Natal",
+   "lat": -27.0249,
+   "lng": 31.9889,
+   "range_m": 3000,
+   "narration": "Tools here, including a poison applicator and digging-stick weights, look like those used by San people in recent times, suggesting very long cultural continuity.",
+   "confidence": "approximate",
+   "confidence_note": "Some researchers question how direct the link is to later San culture.",
+   "sources": [
+    "d'Errico et al., PNAS (2012)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

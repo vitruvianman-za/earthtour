@@ -1,0 +1,148 @@
+{
+ "id": "moshoeshoe",
+ "title": "Moshoeshoe and the founding of Lesotho",
+ "span": "c. 1786 to 1870, Lesotho and the Free State",
+ "summary": "Moshoeshoe gathered people scattered by the wars of the 1820s into a new nation on a defensible mountain. Through war and diplomacy he kept Basotho independence against Boer and British pressure.",
+ "caveat": "The record combines Sesotho oral tradition with the detailed letters and books of French missionaries who lived at his court from 1833, so later events are well documented and earlier ones less so.",
+ "keywords": [
+  "moshoeshoe",
+  "moshesh",
+  "lesotho",
+  "basotho",
+  "thaba bosiu"
+ ],
+ "stops": [
+  {
+   "date": "c. 1786",
+   "title": "Born at Menkhoaneng",
+   "place": "near present-day Hlotse, Lesotho",
+   "lat": -28.87336111,
+   "lng": 28.04158333,
+   "range_m": 20000,
+   "narration": "Lepoqo, later called Moshoeshoe, was born the son of a minor Koena chief. The name Moshoeshoe, \"the shaver\", came from a daring cattle raid in his youth.",
+   "confidence": "approximate",
+   "confidence_note": "His birth year is estimated; the marker shows Hlotse, near Menkhoaneng.",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1820",
+   "title": "Butha-Buthe",
+   "place": "Butha-Buthe, Lesotho",
+   "lat": -28.78333333,
+   "lng": 28.23333333,
+   "range_m": 10000,
+   "narration": "Moshoeshoe set up his first stronghold on the mountain at Butha-Buthe. Raids during the wars of the early 1820s showed him it could not be held.",
+   "confidence": "approximate",
+   "confidence_note": "Dates for these years come from oral tradition.",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1824",
+   "title": "Thaba Bosiu",
+   "place": "Thaba Bosiu, Lesotho",
+   "lat": -29.3503,
+   "lng": 27.6713,
+   "range_m": 6000,
+   "narration": "He led his people on a winter march to this flat-topped mountain, the \"mountain at night\". It was never taken by force, and refugees of many origins gathered under his protection.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)",
+    "Eugene Casalis, The Basutos (1861)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1833",
+   "title": "Missionaries at Morija",
+   "place": "Morija, Lesotho",
+   "lat": -29.62972222,
+   "lng": 27.51333333,
+   "range_m": 5000,
+   "narration": "Moshoeshoe invited French Protestant missionaries to settle here. They brought writing, advice in dealing with Europeans, and a written record of his reign.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)",
+    "Eugene Casalis, The Basutos (1861)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "20 December 1852",
+   "title": "Battle of Berea",
+   "place": "Berea Plateau, Lesotho",
+   "lat": -29.32,
+   "lng": 27.6,
+   "range_m": 15000,
+   "narration": "A British force came to seize cattle and was fought to a standstill. That night Moshoeshoe sent a famously tactful letter offering peace, and the British withdrew.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1865",
+   "title": "Thaba Bosiu holds",
+   "place": "Thaba Bosiu, Lesotho",
+   "lat": -29.3503,
+   "lng": 27.6713,
+   "range_m": 6000,
+   "narration": "In the wars with the Orange Free State over farmland, Free State forces besieged the mountain. Their commander was killed in an assault and the siege failed.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1869",
+   "title": "Treaty of Aliwal North",
+   "place": "Aliwal North, Eastern Cape",
+   "lat": -30.7,
+   "lng": 26.7,
+   "range_m": 15000,
+   "narration": "Moshoeshoe had asked for British protection, and Basutoland was annexed in 1868. This treaty fixed borders that left much of the western lowlands in the Free State.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "11 March 1870",
+   "title": "Dies at Thaba Bosiu",
+   "place": "Thaba Bosiu, Lesotho",
+   "lat": -29.3503,
+   "lng": 27.6713,
+   "range_m": 6000,
+   "narration": "Moshoeshoe died on his mountain, where he is buried. The kingdom he built survived to become independent Lesotho in 1966.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "Leonard Thompson, Survival in Two Worlds: Moshoeshoe of Lesotho, 1786-1870 (1975)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}

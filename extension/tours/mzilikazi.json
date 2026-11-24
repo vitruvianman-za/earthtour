@@ -1,0 +1,145 @@
+{
+ "id": "mzilikazi",
+ "title": "Mzilikazi's migration",
+ "span": "c. 1822 to 1868, from Zululand to Zimbabwe",
+ "summary": "Mzilikazi broke with Shaka and led his followers more than a thousand kilometres north, building the Ndebele kingdom on the move. It ended in present-day Zimbabwe, around Bulawayo.",
+ "caveat": "The record draws on Ndebele oral tradition and the journals of missionaries and travellers who met Mzilikazi. Many of his early settlements are known only approximately.",
+ "keywords": [
+  "mzilikazi",
+  "ndebele",
+  "matabele"
+ ],
+ "stops": [
+  {
+   "date": "c. 1822",
+   "title": "Breaks with Shaka",
+   "place": "Khumalo country, near present-day Mkuze",
+   "lat": -27.61666667,
+   "lng": 32.03333333,
+   "range_m": 30000,
+   "narration": "Mzilikazi, a Khumalo chief serving Shaka, kept cattle from a raid instead of handing them over. Expecting punishment, he fled north with a few hundred followers.",
+   "confidence": "approximate",
+   "confidence_note": "The year and the starting point are approximate.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1823",
+   "title": "On the Steelpoort",
+   "place": "near present-day Steelpoort, Limpopo",
+   "lat": -24.73,
+   "lng": 30.2,
+   "range_m": 40000,
+   "narration": "His followers settled for a few years in the east of the Highveld, raiding and absorbing local communities. The kingdom grew as captives and refugees joined.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows the general area of these early settlements.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1827",
+   "title": "Settles near the Magaliesberg",
+   "place": "west of present-day Pretoria",
+   "lat": -25.74416667,
+   "lng": 27.89944444,
+   "range_m": 40000,
+   "narration": "The Ndebele moved west and built towns in the Magaliesberg area. In 1829 the missionary Robert Moffat visited, beginning a long friendship with Mzilikazi.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows Hartbeespoort; his towns lay across this region.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)",
+    "The Matabele Journals of Robert Moffat (1945)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1832",
+   "title": "Moves to Mosega",
+   "place": "near present-day Zeerust, North West",
+   "lat": -25.53333333,
+   "lng": 26.08333333,
+   "range_m": 25000,
+   "narration": "Pressed by raids from Zulu and Griqua forces, Mzilikazi moved further west to the Marico valley, with Mosega as a main centre.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows Zeerust; Mosega lies nearby.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "October 1836",
+   "title": "Battle of Vegkop",
+   "place": "near present-day Heilbron, Free State",
+   "lat": -27.4775,
+   "lng": 27.91388889,
+   "range_m": 8000,
+   "narration": "Ndebele regiments attacked a Voortrekker wagon laager here and were driven off by gunfire, though they took most of the trekkers' cattle.",
+   "confidence": "established",
+   "confidence_note": "",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "1837",
+   "title": "Driven from Mosega",
+   "place": "near present-day Zeerust, North West",
+   "lat": -25.53333333,
+   "lng": 26.08333333,
+   "range_m": 25000,
+   "narration": "Voortrekker and Griqua forces attacked Mosega in January and again later in the year. Mzilikazi decided to leave the Highveld and lead his people north across the Limpopo.",
+   "confidence": "approximate",
+   "confidence_note": "Locations are approximate.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "c. 1840",
+   "title": "A new kingdom",
+   "place": "around present-day Bulawayo, Zimbabwe",
+   "lat": -20.17,
+   "lng": 28.58,
+   "range_m": 40000,
+   "narration": "After the migration split and rejoined, the Ndebele settled on the highlands of south-western Zimbabwe, conquering and absorbing Shona and other communities there.",
+   "confidence": "approximate",
+   "confidence_note": "His capitals moved over time; the marker shows Bulawayo.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  },
+  {
+   "date": "September 1868",
+   "title": "Buried in the Matobo Hills",
+   "place": "Matobo Hills, Zimbabwe",
+   "lat": -20.55,
+   "lng": 28.508,
+   "range_m": 25000,
+   "narration": "Mzilikazi died after nearly 50 years as king and was buried in a cave at Entumbane in the Matobo Hills. His son Lobengula succeeded him.",
+   "confidence": "approximate",
+   "confidence_note": "The marker shows the Matobo hills; the grave site lies within them.",
+   "sources": [
+    "R. Kent Rasmussen, Migrant Kingdom: Mzilikazi's Ndebele in South Africa (1978)"
+   ],
+   "geocode_query": "",
+   "snapped": false
+  }
+ ],
+ "curated": true,
+ "generated": false
+}
