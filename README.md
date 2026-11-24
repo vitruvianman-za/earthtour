@@ -44,7 +44,7 @@ The map is the interface. Nothing sits in a corner competing with it.
 
 - **Places and questions** fly straight there. If a phrase could mean several places ("Paris"), you pick from a short list.
 - **Journeys** (phrases like *follow*, *trace*, *campaigns*, *voyage*, *expedition*, *hajj*) show a **Tour** label and open as a tour in Earth.
-- **In a tour:** ← and → step between stops, the play button advances on its own, and clicking a point on the timeline jumps there. Dragging the map hides the marker; click the current point to fly back. **Notes** shows the uncertainty, sources, a legend and a **KML** download, which you can import into an Earth project to see the route drawn as a line.
+- **In a tour:** ← and → step between stops, and clicking a point on the timeline jumps there. **Play** (or Space) advances on its own, giving each stop time to read; the leg to the next stop fills in as the countdown. Dragging the map hides the marker; click the current point to fly back. **Notes** shows the uncertainty, sources, a legend and a **KML** download, which you can import into an Earth project to see the route drawn as a line.
 
 ## Install
 

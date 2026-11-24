@@ -96,6 +96,8 @@
 .sc .leg.approximate{border-top-style:dashed}
 .sc .leg.disputed{border-top-style:dotted;border-top-width:2.5px}
 .sc .leg.done{border-top-color:#fff}
+.sc .leg.run::after{content:"";position:absolute;left:0;right:0;top:-2px;border-top:2px solid #fff;transform-origin:left;transform:scaleX(0);animation:run var(--dur) linear var(--delay) forwards}
+@keyframes run{to{transform:scaleX(1)}}
 .sc .s{all:unset;position:absolute;top:50%;width:8px;height:8px;border:1.5px solid var(--w2);background:#16181d;
   transform:translate(-50%,-50%) rotate(45deg);cursor:pointer;box-sizing:border-box}
 .sc .s::after{content:"";position:absolute;inset:-6px}
@@ -107,7 +109,7 @@
 @keyframes pop{from{transform:translate(-50%,-50%) rotate(45deg) scale(0)}to{transform:translate(-50%,-50%) rotate(45deg) scale(1)}}
 
 @media (max-width:620px){.band{left:12px;right:12px}}
-@media (prefers-reduced-motion:reduce){.ann,.band,.sc .s.new,.cursor{transition:none;animation:none}}`;
+@media (prefers-reduced-motion:reduce){.ann,.band,.sc .s.new,.cursor{transition:none;animation:none}.sc .leg.run::after{animation:none;transform:scaleX(.5);opacity:.5}}`;
 
   const CERT = {
     established: { label: 'Established', dash: '' },
@@ -270,6 +272,8 @@ ${marks}
     let i = -1;            // current stop; -1 = not started
     let started = false;
     let playing = false;
+    let dwellStart = 0;   // when the current autoplay countdown began
+    let dwellMs = 0;
     let timer = null;
     let annTimer = null;
     let flownOverview = false;
@@ -346,6 +350,12 @@ ${marks}
 
       for (let k = 1; k < list.length; k++) {
         const leg = el('div', `leg ${list[k].confidence}${cur != null && k <= cur ? ' done' : ''}`);
+        if (playing && dwellMs && cur != null && k === cur + 1) {
+          // Autoplay countdown: the leg to the next stop fills in, picking up where it was.
+          leg.classList.add('run');
+          leg.style.setProperty('--dur', dwellMs + 'ms');
+          leg.style.setProperty('--delay', -(Date.now() - dwellStart) + 'ms');
+        }
         leg.style.left = pos[k - 1] + '%';
         leg.style.width = Math.max(0, pos[k] - pos[k - 1]) + '%';
         rail.append(leg);
@@ -562,17 +572,21 @@ ${marks}
     }
     function schedule() {
       clearTimeout(timer);
+      dwellMs = 0;
       if (playing) {
         if (i >= stops().length - 1 && !planning()) playing = false;
         else {
+          dwellStart = Date.now();
+          dwellMs = dwell(stops()[i]);
           timer = setTimeout(function step() {
             if (i < stops().length - 1) goTo(i + 1);
             else if (planning()) timer = setTimeout(step, 1000); // wait for the next stop to arrive
             else {
               playing = false;
+              dwellMs = 0;
               render();
             }
-          }, dwell(stops()[i]));
+          }, dwellMs);
         }
       }
       render();
@@ -600,8 +614,17 @@ ${marks}
     sub.addEventListener('scroll', checkOverflow, { passive: true });
 
     // ---------- updates from storage ----------
+    // What the band actually shows; storage also changes for index echoes and coordinate
+    // snaps, and rebuilding the row on those could swallow a click halfway through.
+    function visible(a) {
+      if (!a) return '';
+      const t = a.tour || {};
+      return [a.status, (t.stops || []).length, t.title, t.span, t.summary, t.caveat, a.error, a.region ? 1 : 0].join('|');
+    }
+
     function update(active) {
       const firstTime = !A;
+      const before = visible(A);
       A = active;
       if (firstTime && Number.isInteger(active.index) && active.index >= 0 && stops().length) {
         // Earth reloaded mid-tour: carry on where we were.
@@ -626,11 +649,19 @@ ${marks}
       if (planning() && Date.now() - (A.started || 0) > 4 * 60 * 1000) {
         A = { ...A, status: 'error', error: 'Planning stopped before it finished. Try again.' };
       }
+      if (!firstTime && visible(A) === before) return;
       render();
     }
 
     function handleKey(e) {
       if (e.type !== 'keydown' || e.altKey || e.ctrlKey || e.metaKey || !started) return false;
+      if (e.key === ' ' && !e.repeat) {
+        const f = mount.activeElement;
+        if (f && f.tagName === 'BUTTON') return false;
+        e.preventDefault();
+        togglePlay();
+        return true;
+      }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         next();
