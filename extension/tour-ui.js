@@ -527,6 +527,11 @@ ${marks}
 
     function renderInner() {
       if (!A) return;
+      if (started && !stops()[i]) {
+        // The current stop has gone (a shorter tour replaced this one): fall back safely.
+        i = Math.min(i, stops().length - 1);
+        if (i < 0) reset();
+      }
       clearInterval(tick);
       tick = null;
       if (A.status === 'error' && !started) return renderError();
@@ -567,6 +572,7 @@ ${marks}
       if (i > 0) goTo(i - 1);
     }
     function dwell(s) {
+      if (!s) return 11000;
       const words = (s.narration || '').trim().split(/\s+/).length;
       return Math.min(26000, Math.max(11000, 7000 + words * 230));
     }
@@ -592,6 +598,7 @@ ${marks}
       render();
     }
     function togglePlay() {
+      if (!started || !stops()[i]) return;
       playing = !playing;
       if (playing && i >= stops().length - 1 && !planning()) return goTo(0);
       schedule();
@@ -622,7 +629,28 @@ ${marks}
       return [a.status, (t.stops || []).length, t.title, t.span, t.summary, t.caveat, a.error, a.region ? 1 : 0].join('|');
     }
 
+    // Back to a clean slate, for a new tour arriving in a tab that already has one open.
+    function reset() {
+      clearTimeout(timer);
+      clearTimeout(annTimer);
+      clearInterval(tick);
+      tick = null;
+      playing = false;
+      dwellMs = 0;
+      started = false;
+      i = -1;
+      seen = 0;
+      moreOpen = false;
+      flownOverview = false;
+      lastCam = null;
+      hideAnn();
+    }
+
     function update(active) {
+      if (A && active && (active.started !== A.started || active.phrase !== A.phrase)) {
+        reset();
+        A = null;
+      }
       const firstTime = !A;
       const before = visible(A);
       A = active;
