@@ -49,7 +49,7 @@
 
 /* documentary band */
 .band{position:fixed;z-index:2147483646;left:84px;right:236px;bottom:30px;max-width:760px;margin:0 auto;min-width:300px;
-  background:var(--band);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:2px solid var(--hi);
+  background:var(--band);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.14);
   animation:in .25s ease-out}
 @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .x{position:absolute;right:6px;top:6px;width:28px;height:28px;display:grid;place-items:center;z-index:1}

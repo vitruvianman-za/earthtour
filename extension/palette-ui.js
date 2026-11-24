@@ -10,7 +10,7 @@
 .ej-overlay.ej-open{display:block}
 .ej-popup{display:block}
 .ej-backdrop{position:absolute;inset:0;background:rgba(10,12,16,.28)}
-.ej-panel{background:rgba(14,16,20,.88);border:0;border-top:2px solid #FFC94A;border-radius:0;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+.ej-panel{background:rgba(14,16,20,.88);border:0;border-top:1px solid rgba(255,255,255,.14);border-radius:0;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
 .ej-overlay .ej-panel{position:absolute;left:50%;top:14vh;width:min(580px,calc(100vw - 32px));transform:translateX(-50%);animation:ej-in .16s ease-out}
 @keyframes ej-in{from{opacity:0;transform:translate(-50%,-6px) scale(.98)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 .ej-popup .ej-panel{width:400px;border:0;border-radius:0;box-shadow:none;background:#15171C}
