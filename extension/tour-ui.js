@@ -55,7 +55,9 @@
 .x{position:absolute;right:6px;top:6px;width:28px;height:28px;display:grid;place-items:center;z-index:1}
 .x:hover,.ib:hover{background:rgba(255,255,255,.1)}
 .x svg{width:12px;height:12px}
-.sub{padding:12px 44px 10px 16px;max-height:min(34vh,13em);overflow:auto;font:400 14px/1.5 var(--sans);max-width:64ch}
+.sub{padding:12px 44px 10px 16px;max-height:min(34vh,13em);overflow:auto;overscroll-behavior:contain;font:400 14px/1.5 var(--sans);max-width:64ch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+.sub.more-below{-webkit-mask-image:linear-gradient(#000 calc(100% - 32px),transparent);mask-image:linear-gradient(#000 calc(100% - 32px),transparent)}
+.sub::-webkit-scrollbar{width:6px}.sub::-webkit-scrollbar-track{background:transparent}.sub::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28)}
 .sub .ttl{font-weight:600;font-size:15.5px}
 .sub .dim{color:var(--w2)}
 .sub .mono{font:400 12.5px/1.5 var(--mono);color:var(--w2)}
@@ -72,33 +74,37 @@
 .more .legend svg{width:22px;height:6px;margin-right:6px;vertical-align:1px}
 .more .lnk{color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font:400 12px var(--mono)}
 
-.tl{display:flex;align-items:center;gap:10px;padding:0 10px 10px}
+.tl{display:flex;align-items:center;gap:12px;min-height:30px;padding:0 14px 10px 8px}
+.tl>.meta:first-child{padding-left:8px}
 .ctr{display:flex;gap:2px;flex:none}
 .ib{width:30px;height:30px;display:grid;place-items:center}
 .ib[disabled]{opacity:.3;cursor:default;background:none}
 .ib svg{width:12px;height:12px}
 .go{flex:none;padding:8px 12px;background:var(--hi);color:#111;font:600 12.5px/1 var(--sans);white-space:nowrap}
 .go[disabled]{opacity:.35;cursor:default}
-.meta{display:flex;gap:12px;flex:none;font:400 11.5px var(--mono);color:var(--w2);white-space:nowrap}
+.meta{display:flex;align-items:center;gap:12px;flex:none;font:400 11.5px/1 var(--mono);color:var(--w2);white-space:nowrap}
 .meta b{color:#fff;font-weight:700}
-.meta .lnk{color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.meta .lnk{color:#fff;text-decoration:underline;text-underline-offset:3px;cursor:pointer;line-height:1}
 
-/* time scale */
-.sc{position:relative;flex:1;min-width:120px;height:30px}
-.sc .base{position:absolute;left:0;right:0;top:9px;border-top:1px solid var(--w3)}
-.sc .leg{position:absolute;top:9px;height:0;border-top:2px solid var(--w3)}
+/* time scale: years sit at the ends, everything centred on one line */
+.span{display:flex;align-items:center;gap:8px;flex:1;min-width:140px}
+.span .y{flex:none;font:400 10.5px/1 var(--mono);color:var(--w2);white-space:nowrap}
+.sc{position:relative;flex:1;height:20px}
+.sc .rail{position:absolute;left:7px;right:7px;top:0;bottom:0}
+.sc .base{position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--w3)}
+.sc .leg{position:absolute;top:50%;height:0;margin-top:-.5px;border-top:2px solid var(--w3)}
 .sc .leg.approximate{border-top-style:dashed}
 .sc .leg.disputed{border-top-style:dotted;border-top-width:2.5px}
 .sc .leg.done{border-top-color:#fff}
-.sc .s{all:unset;position:absolute;top:5px;width:8px;height:8px;margin-left:-4px;border:1.5px solid var(--w2);transform:rotate(45deg);cursor:pointer;box-sizing:border-box}
+.sc .s{all:unset;position:absolute;top:50%;width:8px;height:8px;border:1.5px solid var(--w2);background:#16181d;
+  transform:translate(-50%,-50%) rotate(45deg);cursor:pointer;box-sizing:border-box}
+.sc .s::after{content:"";position:absolute;inset:-6px}
+.sc .s:hover{border-color:#fff}
 .sc .s.done{background:#fff;border-color:#fff}
-.sc .s.cur{top:3px;width:12px;height:12px;margin-left:-6px;background:var(--hi);border-color:#111;box-shadow:0 0 0 1.5px #fff}
+.sc .s.cur{width:12px;height:12px;background:var(--hi);border-color:#111;box-shadow:0 0 0 1.5px #fff;z-index:1}
 .sc .s.new{animation:pop .35s ease-out}
 .sc .s[disabled]{cursor:default}
-@keyframes pop{from{transform:rotate(45deg) scale(0)}to{transform:rotate(45deg) scale(1)}}
-.sc .y{position:absolute;top:18px;font:400 10.5px var(--mono);color:var(--w2);white-space:nowrap}
-.sc .y.cur{color:var(--hi);font-weight:700;transform:translateX(-50%)}
-.sc .y.r{right:0}
+@keyframes pop{from{transform:translate(-50%,-50%) rotate(45deg) scale(0)}to{transform:translate(-50%,-50%) rotate(45deg) scale(1)}}
 
 @media (max-width:620px){.band{left:12px;right:12px}}
 @media (prefers-reduced-motion:reduce){.ann,.band,.sc .s.new,.cursor{transition:none;animation:none}}`;
@@ -156,7 +162,7 @@
   }
 
   // Positions (0..100) on the time scale, with a minimum gap so close years stay clickable.
-  function positions(stops) {
+  function positions(stops, gapPct) {
     const ys = stops.map((s) => yearOf(s.date));
     for (let i = 0; i < ys.length; i++) {
       if (ys[i] == null) ys[i] = i > 0 && ys[i - 1] != null ? ys[i - 1] : 0; // undated: sit with the previous stop
@@ -164,10 +170,15 @@
     const lo = Math.min(...ys), hi = Math.max(...ys);
     const span = hi - lo;
     let pos = ys.map((y, i) => (span > 0 ? ((y - lo) / span) * 100 : stops.length > 1 ? (i / (stops.length - 1)) * 100 : 0));
-    const gap = Math.min(4, 100 / Math.max(1, stops.length));
+    const gap = Math.min(gapPct || 4, 100 / Math.max(1, stops.length - 1));
+    // Push crowded stops apart: forwards, then back from the end if they ran past it.
     for (let i = 1; i < pos.length; i++) pos[i] = Math.max(pos[i], pos[i - 1] + gap);
-    const last = pos[pos.length - 1];
-    if (last > 100) pos = pos.map((p) => (p / last) * 100);
+    const n = pos.length;
+    if (n && pos[n - 1] > 100) {
+      pos[n - 1] = 100;
+      for (let i = n - 2; i >= 0; i--) pos[i] = Math.min(pos[i], pos[i + 1] - gap);
+      if (pos[0] < 0) pos = pos.map((p, i) => (n > 1 ? (i / (n - 1)) * 100 : 0)); // too many to fit: space evenly
+    }
     return { pos, lo, hi };
   }
 
@@ -305,19 +316,39 @@ ${marks}
 
     // ---------- time scale ----------
     function renderScale(cur) {
-      const sc = el('div', 'sc');
       const list = stops();
-      sc.append(el('div', 'base'));
+      const wrap = el('div', 'span');
+      const sc = el('div', 'sc');
+      const rail = el('div', 'rail');
+      rail.append(el('div', 'base'));
+      sc.append(rail);
       if (!list.length) {
-        tl.append(sc);
+        wrap.append(sc);
+        tl.append(wrap);
         return;
       }
-      const { pos, lo, hi } = positions(list);
+      const ys = list.map((s) => yearOf(s.date)).filter((y) => y != null);
+      const lo = ys.length ? Math.min(...ys) : null, hi = ys.length ? Math.max(...ys) : null;
+      if (lo != null) wrap.append(el('span', 'y', yearLabel(lo)));
+      wrap.append(sc);
+      if (hi != null && hi !== lo) wrap.append(el('span', 'y', yearLabel(hi)));
+      tl.append(wrap);
+
+      // Place the stops once the rest of the row has been built (still before the next
+      // paint), so the rail's measured width is final and close stops stay 16px apart.
+      queueMicrotask(() => place(rail, list, cur));
+    }
+
+    function place(rail, list, cur) {
+      if (!rail.isConnected) return;
+      const w = rail.clientWidth || 300;
+      const { pos } = positions(list, (16 / w) * 100);
+
       for (let k = 1; k < list.length; k++) {
         const leg = el('div', `leg ${list[k].confidence}${cur != null && k <= cur ? ' done' : ''}`);
         leg.style.left = pos[k - 1] + '%';
         leg.style.width = Math.max(0, pos[k] - pos[k - 1]) + '%';
-        sc.append(leg);
+        rail.append(leg);
       }
       list.forEach((s, k) => {
         const b = el('button', 's');
@@ -332,19 +363,9 @@ ${marks}
         b.setAttribute('aria-label', `Stop ${k + 1}: ${s.title}`);
         if (!started) b.disabled = true;
         else b.addEventListener('click', () => goTo(k));
-        sc.append(b);
+        rail.append(b);
       });
       seen = list.length;
-      const yl = el('span', 'y', yearLabel(lo));
-      yl.style.left = '0';
-      sc.append(yl);
-      if (cur != null && list[cur] && pos[cur] > 12 && pos[cur] < 88) {
-        const yc = el('span', 'y cur', list[cur].date);
-        yc.style.left = pos[cur] + '%';
-        sc.append(yc);
-      }
-      if (hi !== lo) sc.append(el('span', 'y r', yearLabel(hi)));
-      tl.append(sc);
     }
 
     // ---------- band contents ----------
@@ -368,7 +389,7 @@ ${marks}
       const t = A.tour || {};
       sub.textContent = '';
       const head = el('div');
-      head.append(el('span', 'dim', 'Planning a tour: '), el('span', 'ttl', t.title || `“${A.phrase}”`));
+      head.append(el('span', 'dim', 'Planning a tour: '), el('span', 'ttl', t.title || `\u201c${A.phrase}\u201d`));
       sub.append(head);
       const last = list[list.length - 1];
       const ln = el('div', 'mono');
@@ -490,6 +511,11 @@ ${marks}
     }
 
     function render() {
+      renderInner();
+      queueMicrotask(checkOverflow);
+    }
+
+    function renderInner() {
       if (!A) return;
       clearInterval(tick);
       tick = null;
@@ -566,6 +592,12 @@ ${marks}
       onClose();
     }
     xBtn.addEventListener('click', close);
+
+    // Fade the bottom of the subtitles while there's more text to scroll to.
+    function checkOverflow() {
+      sub.classList.toggle('more-below', sub.scrollTop + sub.clientHeight < sub.scrollHeight - 2);
+    }
+    sub.addEventListener('scroll', checkOverflow, { passive: true });
 
     // ---------- updates from storage ----------
     function update(active) {

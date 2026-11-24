@@ -62,28 +62,34 @@ async function cacheSet(bucket, key, value) {
 // ---------- calling Claude ----------
 // Structured outputs: the request carries a JSON schema and the API constrains the reply
 // to it, so the JSON is always valid (a stray quote in a narration can't break it).
-async function requestClaude({ model, system, schema, phrase, maxTokens, stream = false, signal }) {
+async function requestClaude({ model, system, schema, phrase, maxTokens, stream = false, signal, effort, thinking }) {
   const { apiKey } = await chrome.storage.local.get('apiKey');
   if (!apiKey) throw codedError('NO_KEY', 'Add your Anthropic API key in Settings.');
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    signal,
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      system,
-      stream,
-      output_config: { format: { type: 'json_schema', schema } },
-      messages: [{ role: 'user', content: phrase }]
-    })
-  });
+  const send = (withTuning) => {
+    const output_config = { format: { type: 'json_schema', schema } };
+    const body = { model, max_tokens: maxTokens, system, stream, output_config, messages: [{ role: 'user', content: phrase }] };
+    if (withTuning && effort) output_config.effort = effort;
+    if (withTuning && thinking) body.thinking = thinking;
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      signal,
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(body)
+    });
+  };
+
+  let res = await send(true);
+  // If a model ever rejects the speed settings, retry once with its defaults rather than failing.
+  if (res.status === 400 && (effort || thinking)) {
+    const text = await res.clone().text();
+    if (/effort|thinking/i.test(text)) res = await send(false);
+  }
 
   if (!res.ok) {
     if (res.status === 401) throw codedError('NO_KEY', 'Your API key was rejected. Check it in Settings.');
@@ -94,6 +100,17 @@ async function requestClaude({ model, system, schema, phrase, maxTokens, stream 
   }
   return res;
 }
+
+// Quick lookups (places, region): Haiku at low effort with thinking off. These are
+// simple, and thinking would otherwise eat into their small token budgets.
+const QUICK = { effort: 'low', thinking: { type: 'disabled' } };
+
+// Tours. Sonnet 5.5 defaults to high effort and thinks before writing, so nothing
+// streams until it finishes. "Fast" writes straight away; "careful" thinks first.
+const TOUR_MODES = {
+  fast: { effort: 'medium', thinking: { type: 'between_tools' }, maxTokens: 8000 },
+  careful: { effort: 'high', thinking: null, maxTokens: 20000 }
+};
 
 function checkStop(reason) {
   if (reason === 'max_tokens') throw new Error('The answer was cut off before it finished. Try a narrower request.');
@@ -229,9 +246,6 @@ const TOUR_SCHEMA = {
     type: 'object',
     properties: {
       title: { type: 'string' },
-      span: { type: 'string' },
-      summary: { type: 'string' },
-      caveat: { type: 'string' },
       stops: {
         type: 'array',
         items: {
@@ -253,9 +267,12 @@ const TOUR_SCHEMA = {
           additionalProperties: false
         }
       },
+      span: { type: 'string' },
+      summary: { type: 'string' },
+      caveat: { type: 'string' },
       error: { type: 'string', description: 'Only when the request is not a mappable historical journey.' }
     },
-    required: ['title', 'span', 'summary', 'caveat', 'stops'],
+    required: ['title', 'stops', 'span', 'summary', 'caveat'],
     additionalProperties: false
 };
 
@@ -276,7 +293,7 @@ async function resolve(phrase) {
   const hit = await cacheGet('phraseCache', key);
   if (hit) return { candidates: hit, cached: true };
 
-  const parsed = await callClaude({ model: MODEL, system: SYSTEM, schema: PLACES_SCHEMA, phrase, maxTokens: 1000 });
+  const parsed = await callClaude({ model: MODEL, system: SYSTEM, schema: PLACES_SCHEMA, phrase, maxTokens: 1000, ...QUICK });
   if (parsed.error) throw new Error(parsed.error);
 
   const candidates = (parsed.candidates || []).filter(validCandidate).slice(0, 5);
@@ -293,6 +310,7 @@ const TOUR_SYSTEM = `You create historical map tours that a 3D globe will fly th
 Answer in the required JSON format.
 Fields:
 - title: short name of the journey, e.g. "Shaka's rise and campaigns".
+- Write the stops before span, summary and caveat.
 - span: years and region, e.g. "1816 to 1828, KwaZulu-Natal".
 - summary: two sentences on what the journey was and why it mattered.
 - caveat: one or two sentences on where the historical record comes from and how reliable it is.
@@ -432,7 +450,7 @@ async function runTour(phrase, tabId) {
   await persist(true);
 
   // Quick region guess so Earth starts flying while the tour is written.
-  callClaude({ model: MODEL, system: REGION_SYSTEM, schema: REGION_SCHEMA, phrase, maxTokens: 300, signal: ctrl.signal })
+  callClaude({ model: MODEL, system: REGION_SYSTEM, schema: REGION_SCHEMA, phrase, maxTokens: 400, signal: ctrl.signal, ...QUICK })
     .then((r) => {
       if (j.aborted || !Number.isFinite(r.lat) || !Number.isFinite(r.lng)) return;
       j.active.region = r;
@@ -440,9 +458,12 @@ async function runTour(phrase, tabId) {
     })
     .catch(() => {});
 
+  const { tourMode } = await chrome.storage.local.get('tourMode');
+  const mode = TOUR_MODES[tourMode] || TOUR_MODES.fast;
+
   try {
     const text = await streamClaude(
-      { model: TOUR_MODEL, system: TOUR_SYSTEM, schema: TOUR_SCHEMA, phrase, maxTokens: 8000, signal: ctrl.signal },
+      { model: TOUR_MODEL, system: TOUR_SYSTEM, schema: TOUR_SCHEMA, phrase, signal: ctrl.signal, ...mode },
       (soFar) => {
         if (j.aborted) return;
         const p = partialTour(soFar);

@@ -5,6 +5,16 @@ function flash(text) {
   setTimeout(() => ($('flash').textContent = ''), 1800);
 }
 
+async function refreshMode() {
+  const { tourMode } = await chrome.storage.local.get('tourMode');
+  const v = tourMode === 'careful' ? 'careful' : 'fast';
+  document.querySelector(`input[name=tourMode][value=${v}]`).checked = true;
+}
+document.querySelectorAll('input[name=tourMode]').forEach((r) =>
+  r.addEventListener('change', () => chrome.storage.local.set({ tourMode: r.value }))
+);
+refreshMode();
+
 async function refresh() {
   const { apiKey } = await chrome.storage.local.get('apiKey');
   $('keyState').textContent = apiKey ? `Key saved (ends in ${apiKey.slice(-4)}).` : 'No key saved yet.';

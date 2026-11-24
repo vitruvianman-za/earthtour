@@ -30,6 +30,8 @@
     #keyState { margin-top: 8px; font-size: 13px; color: var(--muted); }
     #flash { margin-left: 8px; color: var(--accent); font-size: 13px; }
     code { font-size: 12.5px; }
+    .opt { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
+    .opt input { flex: none; width: auto; margin: 0; accent-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -41,6 +43,13 @@
       <button class="primary" type="submit">Save</button>
     </form>
     <div id="keyState"></div>
+  </section>
+
+  <section>
+    <h2>Tours</h2>
+    <p>How Claude writes a tour. Fast starts streaming stops within seconds. Careful thinks the whole journey through first, which can take a minute before stop 1 appears.</p>
+    <label class="opt"><input type="radio" name="tourMode" value="fast"> <span><b>Fast</b> (default)</span></label>
+    <label class="opt"><input type="radio" name="tourMode" value="careful"> <span><b>Careful</b></span></label>
   </section>
 
   <section>
