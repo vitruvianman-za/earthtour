@@ -141,14 +141,29 @@
   }
 
   function earthCam(lat, lng, range, tilt, heading) {
-    return `https://earth.google.com/web/@${lat.toFixed(6)},${lng.toFixed(6)},0a,${Math.round(range)}d,35y,${Math.round(heading)}h,${tilt}t,0r`;
+    const d = Math.min(2e7, Math.max(300, Math.round(range) || 0));
+    return `https://earth.google.com/web/@${lat.toFixed(6)},${lng.toFixed(6)},0a,${d}d,35y,${Math.round(heading)}h,${tilt}t,0r`;
   }
   function stopCam(s, i) {
     const range = Math.max(800, s.range_m || 8000);
     return earthCam(s.lat, s.lng, range, range < 60000 ? 55 : 25, ((i * 47) % 50) - 25);
   }
+  // Average longitude around the circle, so a tour either side of the dateline
+  // (179 and -179) centres on 180, not on 0 off the coast of Africa.
+  function meanLng(stops) {
+    let x = 0, y = 0;
+    for (const s of stops) {
+      const r = (s.lng * Math.PI) / 180;
+      x += Math.cos(r);
+      y += Math.sin(r);
+    }
+    return x === 0 && y === 0 ? stops[0].lng : (Math.atan2(y, x) * 180) / Math.PI;
+  }
   function overviewCam(stops) {
-    const c = { lat: stops.reduce((a, p) => a + p.lat, 0) / stops.length, lng: stops.reduce((a, p) => a + p.lng, 0) / stops.length };
+    const c = {
+      lat: stops.reduce((a, p) => a + p.lat, 0) / stops.length,
+      lng: meanLng(stops)
+    };
     const spread = Math.max(...stops.map((p) => distanceM(c, p)));
     return earthCam(c.lat, c.lng, Math.min(9e6, Math.max(40000, spread * 2.8)), 0, 0);
   }
@@ -204,20 +219,46 @@
   function xml(s) {
     return String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
   }
+  // Split the route where it crosses the antimeridian. Drawing one LineString from
+  // 179E to 179W would otherwise run the long way round the whole globe.
+  function routePaths(stops) {
+    if (!stops.length) return [];
+    const lines = [];
+    let cur = [[stops[0].lng, stops[0].lat]];
+    for (let i = 1; i < stops.length; i++) {
+      const a = stops[i - 1], b = stops[i];
+      if (Math.abs(b.lng - a.lng) > 180) {
+        const lng2 = b.lng + (b.lng > a.lng ? -360 : 360);
+        const edge = lng2 > a.lng ? 180 : -180;
+        const t = (edge - a.lng) / (lng2 - a.lng);
+        const lat = a.lat + (b.lat - a.lat) * t;
+        cur.push([edge, lat]);
+        lines.push(cur);
+        cur = [[-edge, lat], [b.lng, b.lat]];
+      } else {
+        cur.push([b.lng, b.lat]);
+      }
+    }
+    lines.push(cur);
+    return lines.filter((l) => l.length > 1);
+  }
   function toKml(tour) {
-    const line = tour.stops.map((s) => `${s.lng},${s.lat},0`).join(' ');
     const marks = tour.stops.map((s, i) => {
       const desc = [s.date, s.place, s.narration,
         `Confidence: ${(CERT[s.confidence] || CERT.approximate).label}${s.confidence_note ? ' (' + s.confidence_note + ')' : ''}`,
         s.sources && s.sources.length ? 'Sources: ' + s.sources.join('; ') : ''].filter(Boolean).join('\n\n');
       return `<Placemark><name>${xml(`${i + 1}. ${s.title}`)}</name><description>${xml(desc)}</description><Point><coordinates>${s.lng},${s.lat},0</coordinates></Point></Placemark>`;
     }).join('\n');
+    const routes = routePaths(tour.stops).map((line, n) => {
+      const coords = line.map(([lng, lat]) => `${lng},${lat},0`).join(' ');
+      return `<Placemark><name>Route${n ? ' ' + (n + 1) : ''}</name><styleUrl>#route</styleUrl><LineString><tessellate>1</tessellate><coordinates>${coords}</coordinates></LineString></Placemark>`;
+    }).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2"><Document>
 <name>${xml(tour.title || 'Tour')}</name>
 <description>${xml(`${tour.span || ''}\n\n${tour.summary || ''}\n\n${tour.caveat || ''}\n\n${provenance(tour)}`)}</description>
 <Style id="route"><LineStyle><color>ff4ac9ff</color><width>4</width></LineStyle></Style>
-<Placemark><name>Route</name><styleUrl>#route</styleUrl><LineString><tessellate>1</tessellate><coordinates>${line}</coordinates></LineString></Placemark>
+${routes}
 ${marks}
 </Document></kml>`;
   }
@@ -297,6 +338,9 @@ ${marks}
     let seen = 0;          // stops already drawn, to animate new ones
     let moreOpen = false;
     let tick = null;
+    let stallTimer = null;
+    let lastProgress = 0;
+    const STALL_MS = 4 * 60 * 1000;
 
     const stops = () => (A && A.tour && A.tour.stops) || [];
     const planning = () => A && A.status === 'planning';
@@ -625,6 +669,8 @@ ${marks}
       clearTimeout(timer);
       clearTimeout(annTimer);
       clearInterval(tick);
+      clearInterval(stallTimer);
+      stallTimer = null;
       root.remove();
       style.remove();
       onClose();
@@ -646,12 +692,37 @@ ${marks}
       return [a.status, (t.stops || []).length, t.title, t.span, t.summary, t.caveat, a.error, a.region ? 1 : 0].join('|');
     }
 
+    // If the background goes quiet mid-tour (a dead request, a killed service worker),
+    // the band would say "Planning" forever. Watch for silence rather than total
+    // elapsed time, so a slow but still-progressing tour is left alone.
+    function watchPlanning() {
+      clearInterval(stallTimer);
+      stallTimer = null;
+      if (!planning()) return;
+      if (!lastProgress) lastProgress = Date.now();
+      stallTimer = setInterval(() => {
+        if (!A || !planning()) {
+          clearInterval(stallTimer);
+          stallTimer = null;
+          return;
+        }
+        if (Date.now() - lastProgress <= STALL_MS) return;
+        clearInterval(stallTimer);
+        stallTimer = null;
+        A = { ...A, status: 'error', error: 'Planning stopped before it finished. Try again.' };
+        render();
+      }, 5000);
+    }
+
     // Back to a clean slate, for a new tour arriving in a tab that already has one open.
     function reset() {
       clearTimeout(timer);
       clearTimeout(annTimer);
       clearInterval(tick);
+      clearInterval(stallTimer);
       tick = null;
+      stallTimer = null;
+      lastProgress = 0;
       playing = false;
       dwellMs = 0;
       started = false;
@@ -671,6 +742,8 @@ ${marks}
       const firstTime = !A;
       const before = visible(A);
       A = active;
+      lastProgress = Date.now();
+      watchPlanning();
       if (firstTime && Number.isInteger(active.index) && active.index >= 0 && stops().length) {
         // Earth reloaded mid-tour: carry on where we were.
         started = true;
@@ -689,10 +762,6 @@ ${marks}
           flownOverview = true;
           fly(earthCam(A.region.lat, A.region.lng, A.region.range_m || 400000, 0, 0));
         }
-      }
-      // A planning job that stopped reporting (e.g. the browser restarted mid-way).
-      if (planning() && Date.now() - (A.started || 0) > 4 * 60 * 1000) {
-        A = { ...A, status: 'error', error: 'Planning stopped before it finished. Try again.' };
       }
       if (!firstTime && visible(A) === before) return;
       render();
@@ -730,4 +799,6 @@ ${marks}
 
   window.EarthTourUI._toKml = toKml;
   window.EarthTourUI._positions = positions;
+  window.EarthTourUI._overviewCam = overviewCam;
+  window.EarthTourUI._routePaths = routePaths;
 })();
