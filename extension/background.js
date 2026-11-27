@@ -37,6 +37,13 @@ function distanceM(a, b) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
+// Keep a model-supplied camera distance sane: never inside the ground, never beyond
+// low orbit. A bad range_m would otherwise send Earth to space or through the floor.
+function clampRange(m, fallback = 8000) {
+  const n = Number(m);
+  return Number.isFinite(n) ? Math.min(2e7, Math.max(300, n)) : fallback;
+}
+
 // ---------- small LRU-ish cache in chrome.storage ----------
 const CACHE_MAX = 300;
 
@@ -144,7 +151,9 @@ async function streamClaude(opts, onText) {
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
-    buf += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+    // Normalise the whole buffer, not just this chunk: a CRLF split across two
+    // chunks would otherwise survive as "\r" + "\n" and hide the event boundary.
+    buf = (buf + decoder.decode(value, { stream: true })).replace(/\r\n/g, '\n');
     let cut;
     while ((cut = buf.indexOf('\n\n')) >= 0) {
       const event = buf.slice(0, cut);
@@ -359,7 +368,7 @@ function normStop(s) {
     place: String(s.place || ''),
     lat: s.lat,
     lng: s.lng,
-    range_m: Number.isFinite(s.range_m) ? s.range_m : 8000,
+    range_m: clampRange(s.range_m),
     narration: String(s.narration || ''),
     confidence: ['established', 'approximate', 'disputed'].includes(s.confidence) ? s.confidence : 'approximate',
     confidence_note: String(s.confidence_note || ''),
@@ -426,11 +435,14 @@ async function listTours() {
 }
 
 async function matchPreloaded(phrase) {
-  const p = ' ' + norm(phrase).replace(/[^a-z0-9' -]/g, ' ') + ' ';
+  // Match whole words only: "saso" must not match "Sasol", but "shaka" should still
+  // match "Shaka's", so boundaries are alphanumeric rather than spaces.
+  const p = ` ${norm(phrase)} `;
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   let best = null, bestLen = 0;
   for (const t of await listTours()) {
     for (const k of t.keywords) {
-      if (k.length > bestLen && p.includes(' ' + k)) {
+      if (k.length > bestLen && new RegExp(`(?<![a-z0-9])${esc(k)}(?![a-z0-9])`).test(p)) {
         best = t.id;
         bestLen = k.length;
       }
@@ -595,6 +607,18 @@ async function retryTour(sender) {
   return true;
 }
 
+// Closing the Earth tab ends its tour: nothing will read it again, and a tab id can
+// be reused later, which would otherwise bring a dead tour back. Stop generating too.
+chrome.tabs.onRemoved.addListener(async (tabId) => {
+  if (job && job.active.tabId === tabId) {
+    job.aborted = true;
+    job.ctrl.abort();
+    job = null;
+  }
+  const { activeTour } = await chrome.storage.local.get('activeTour');
+  if (activeTour && activeTour.tabId === tabId) await chrome.storage.local.remove('activeTour');
+});
+
 // ---------- 2. snap coordinates with a real geocoder ----------
 // LLM coordinates are fine for mountains but drift for small places. OpenStreetMap's
 // Nominatim gives precise ones. We only accept the snap if it lands reasonably close to
@@ -611,7 +635,9 @@ async function geocode(name) {
     const r = await fetch(url, { headers: { 'Accept-Language': 'en' } });
     if (!r.ok) return null; // rate-limited or down: don't cache, just skip snapping
     const arr = await r.json();
-    const geo = arr[0] ? { lat: Number(arr[0].lat), lng: Number(arr[0].lon) } : null;
+    const lat = arr[0] ? Number(arr[0].lat) : NaN;
+    const lng = arr[0] ? Number(arr[0].lon) : NaN;
+    const geo = Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
     await cacheSet('geoCache', key, geo);
     return geo;
   } catch {
@@ -638,7 +664,7 @@ function mapsUrl(p) {
 
 function earthUrl(p) {
   // @lat,lng,altitude(a),distance(d),fov(y),heading(h),tilt(t),roll(r)
-  const range = Math.max(300, Math.round(p.range_m || 5000));
+  const range = Math.round(clampRange(p.range_m, 5000));
   const tilt = range < 50000 ? 45 : 0;
   return `https://earth.google.com/web/@${p.lat.toFixed(6)},${p.lng.toFixed(6)},0a,${range}d,35y,0h,${tilt}t,0r`;
 }
