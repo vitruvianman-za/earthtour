@@ -14,7 +14,7 @@ Earth Tour turns a phrase like *“follow Shaka’s campaigns”* into a stop-by
 >
 > Load it unpacked; it isn’t on the Chrome Web Store yet. The 13 researched tours open with **no API key**. Generated tours use your own [Anthropic key](https://console.anthropic.com/) and cost a few cents each.
 
-**Contents:** [Try it](#try-it) · [What you get](#what-you-get) · [Why this exists](#why-this-exists) · [The design](#the-design) · [Preloaded tours](#preloaded-tours) · [Using it](#using-it) · [How it works](#how-it-works) · [Privacy and cost](#privacy-and-cost) · [Limits](#limits) · [Troubleshooting](#troubleshooting) · [Contributing](#contributing) · [Roadmap](#roadmap)
+**Contents:** [Try it](#try-it) · [What you get](#what-you-get) · [Why this exists](#why-this-exists) · [The design](#the-design) · [Preloaded tours](#preloaded-tours) · [Using it](#using-it) · [How it works](#how-it-works) · [Privacy and cost](#privacy-and-cost) · [Limits](#limits) · [Troubleshooting](#troubleshooting) · [Roadmap](#roadmap)
 
 ## Try it
 
@@ -87,7 +87,7 @@ They’re listed when you open the search bar (and narrow as you type a title), 
 
 - **Coordinates** come from Wikipedia’s coordinate data. Where a site has no published coordinates, the stop sits at the nearest verified place and is marked *approximate*, with a note saying so.
 
-- **Not yet reviewed by a historian.** The notes say so. Corrections are welcome — see [Contributing](#contributing).
+- **Not yet reviewed by a historian.** The notes say so. If a stop or a source is wrong, open an issue with the tour, stop and a source.
 
 - **Editing:** tours are built from `tools/build_tours.py`. Edit it and run `python tools/build_tours.py extension/tours` (`python3` on macOS/Linux), then commit the JSON.
 
@@ -167,14 +167,6 @@ phrase ──▶ Claude ──▶ places, or a tour streamed stop by stop ──
 - **“Planning stopped before it finished.”** The request went quiet and the watchdogs gave up. Press **Try again**. If it repeats, check your connection or switch to Fast.
 - **A tour doesn’t appear in the palette list.** Only the 13 researched titles are listed. Type a journey and press Enter to generate one.
 - **A stop sits slightly off.** Coordinates are only snapped when the geocode lands near Claude’s guess. Download the KML to inspect the route, or report the stop.
-
-## Contributing
-
-Corrections and new tours are the most useful contributions.
-
-- **Fix a stop:** open an issue with the tour, stop number, what’s wrong, and a source.
-- **Add or edit a researched tour:** edit `tools/build_tours.py`, run it, and include sources plus coordinates in the PR. If a site has no published coordinate, put the stop at the nearest verified place and mark it approximate.
-- **Code:** issues and pull requests are welcome. A test suite and CI are on the roadmap.
 
 ## Roadmap
 
