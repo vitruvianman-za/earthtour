@@ -106,10 +106,15 @@
     else boot();
 
     // Dragging or zooming the map moves the stop off-centre, so hide its marker.
+    // Only react to the map surface itself: opening Earth's menus or panels is not a
+    // camera move, and hiding the label for every click made them feel broken.
+    const isMapSurface = (path) =>
+      path.some((n) => n && (n.nodeName === 'CANVAS' || n.id === 'map'));
     const moved = (e) => {
       if (!tour) return;
       const path = e.composedPath();
       if (path.includes(tourHost) || (paletteHost && path.includes(paletteHost))) return;
+      if (!isMapSurface(path)) return;
       tour.mapMoved();
     };
     window.addEventListener('pointerdown', moved, true);
