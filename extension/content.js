@@ -106,18 +106,33 @@
     else boot();
 
     // Dragging or zooming the map moves the stop off-centre, so hide its marker.
-    // Only react to the map surface itself: opening Earth's menus or panels is not a
-    // camera move, and hiding the label for every click made them feel broken.
+    // Earth paints its toolbar and panels into the same canvas as the globe, so a
+    // pointerdown can't tell a menu click from a map drag. Wait for movement: a click
+    // keeps the label, while a drag or a wheel hides it.
     const isMapSurface = (path) =>
       path.some((n) => n && (n.nodeName === 'CANVAS' || n.id === 'map'));
+    let press = null;
     const moved = (e) => {
       if (!tour) return;
       const path = e.composedPath();
       if (path.includes(tourHost) || (paletteHost && path.includes(paletteHost))) return;
       if (!isMapSurface(path)) return;
-      tour.mapMoved();
+      if (e.type === 'wheel') {
+        tour.mapMoved();
+        return;
+      }
+      if (e.type === 'pointerdown') {
+        press = { x: e.clientX, y: e.clientY };
+      } else if (press && (e.buttons & 1) && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 4) {
+        press = null;
+        tour.mapMoved();
+      }
     };
+    const released = () => { press = null; };
     window.addEventListener('pointerdown', moved, true);
+    window.addEventListener('pointermove', moved, true);
+    window.addEventListener('pointerup', released, true);
+    window.addEventListener('pointercancel', released, true);
     window.addEventListener('wheel', moved, { capture: true, passive: true });
   }
 
